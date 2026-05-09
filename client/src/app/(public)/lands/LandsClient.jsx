@@ -616,9 +616,15 @@ export default function LandsClient({
                 >
                   {lands.map((land) =>
                     viewMode === "grid" ? (
-                      <PropertyCard key={land.id} land={land} />
+                      <PropertyCard
+                        key={land._id || land.id || land.slug}
+                        land={land}
+                      />
                     ) : (
-                      <PropertyListItem key={land.id} land={land} />
+                      <PropertyListItem
+                        key={land._id || land.id || land.slug}
+                        land={land}
+                      />
                     ),
                   )}
                 </div>

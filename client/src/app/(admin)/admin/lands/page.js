@@ -19,8 +19,6 @@ import {
   Trash2,
   Star,
   StarOff,
-  ChevronLeft,
-  ChevronRight,
   X,
   AlertCircle,
   RefreshCw,
@@ -28,6 +26,7 @@ import {
   Upload,
   Check,
 } from "lucide-react";
+import Pagination from "@/components/admin/Pagination";
 
 function formatPrice(p) {
   if (!p) return "—";
@@ -118,7 +117,7 @@ function ImageUpload({ label, value, onChange, folder = "lands" }) {
         onClick={() => !uploading && ref.current?.click()}
         style={{
           border: `2px dashed ${url ? "#22c55e" : "#e2e8f0"}`,
-          borderRadius: "0.75rem",
+          borderRadius: "var(--radius, 0.75rem)",
           padding: url ? "0.5rem" : "2rem 1rem",
           textAlign: "center",
           cursor: uploading ? "wait" : "pointer",
@@ -242,7 +241,7 @@ function ImageUpload({ label, value, onChange, folder = "lands" }) {
                 margin: "0 0 0.25rem",
                 fontWeight: 600,
                 fontSize: "0.875rem",
-                color: "#475569",
+                color: "var(--color-text-secondary, #475569)",
               }}
             >
               Click to upload
@@ -410,7 +409,7 @@ function TagInput({
                   padding: "0.15rem 0.55rem",
                   fontSize: "0.72rem",
                   cursor: "pointer",
-                  color: "#475569",
+                  color: "var(--color-text-secondary, #475569)",
                 }}
               >
                 + {s}
@@ -505,7 +504,7 @@ function Modal({ open, onClose, title, children, wide }) {
       <div
         style={{
           background: "#fff",
-          borderRadius: "1rem",
+          borderRadius: "var(--radius-lg, 1rem)",
           width: "100%",
           maxWidth: wide ? "820px" : "480px",
           maxHeight: "90vh",
@@ -713,8 +712,6 @@ function LandForm({ initial, onSave, onClose, saving }) {
           />
         </div>
       </div>
-
-      {/* IMAGE UPLOADS */}
       <ImageUpload
         label="Feature Image"
         value={form.feature_image}
@@ -726,7 +723,6 @@ function LandForm({ initial, onSave, onClose, saving }) {
         onChange={(v) => set("gallery", v)}
         folder="lands"
       />
-
       <div>
         <label style={S.label}>YouTube URL (optional)</label>
         <input
@@ -749,7 +745,6 @@ function LandForm({ initial, onSave, onClose, saving }) {
         onChange={(v) => set("neighborhood", v)}
         placeholder="e.g. School 2km away"
       />
-
       <div style={{ borderTop: "1px solid #f1f5f9", paddingTop: "1rem" }}>
         <p
           style={{
@@ -784,7 +779,6 @@ function LandForm({ initial, onSave, onClose, saving }) {
           </div>
         </div>
       </div>
-
       <label
         style={{
           display: "flex",
@@ -826,7 +820,6 @@ function LandForm({ initial, onSave, onClose, saving }) {
           Featured Listing
         </span>
       </label>
-
       <div
         style={{
           display: "flex",
@@ -866,6 +859,7 @@ export default function AdminLandsPage() {
   const [loading, setLoading] = useState(true);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
+  const [perPage, setPerPage] = useState(12);
   const [totalPages, setTotalPages] = useState(1);
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
@@ -880,7 +874,7 @@ export default function AdminLandsPage() {
   const fetchLands = useCallback(async () => {
     setLoading(true);
     try {
-      const params = { page, perPage: 12 };
+      const params = { page, perPage };
       if (search) params.q = search;
       if (filterStatus) params.status = filterStatus;
       if (filterState) params.state = filterState;
@@ -893,7 +887,7 @@ export default function AdminLandsPage() {
     } finally {
       setLoading(false);
     }
-  }, [page, search, filterStatus, filterState]);
+  }, [page, perPage, search, filterStatus, filterState]);
 
   useEffect(() => {
     fetchLands();
@@ -906,6 +900,13 @@ export default function AdminLandsPage() {
       setPage(1);
     }, 400);
   };
+
+  // ── perPage change — reset to page 1 ─────────────────────────
+  const handlePerPage = (n) => {
+    setPerPage(n);
+    setPage(1);
+  };
+
   const handleCreate = async (form) => {
     setSaving(true);
     try {
@@ -922,7 +923,7 @@ export default function AdminLandsPage() {
   const handleUpdate = async (form) => {
     setSaving(true);
     try {
-      await landsApi.update(editLand.id, form);
+      await landsApi.update(editLand._id || editLand.id, form);
       toast.success("Updated!");
       setEditLand(null);
       fetchLands();
@@ -935,7 +936,7 @@ export default function AdminLandsPage() {
   const handleDelete = async () => {
     setDeleting(true);
     try {
-      await landsApi.delete(deleteLand.id);
+      await landsApi.delete(deleteLand._id || deleteLand.id);
       toast.success("Deleted");
       setDeleteLand(null);
       fetchLands();
@@ -947,7 +948,10 @@ export default function AdminLandsPage() {
   };
   const toggleFeatured = async (land) => {
     try {
-      await landsApi.update(land.id, { ...land, featured: !land.featured });
+      await landsApi.update(land._id || land.id, {
+        ...land,
+        featured: !land.featured,
+      });
       fetchLands();
     } catch {
       toast.error("Failed");
@@ -990,7 +994,7 @@ export default function AdminLandsPage() {
               <span
                 style={{
                   background: "#f1f5f9",
-                  color: "#475569",
+                  color: "var(--color-text-secondary, #475569)",
                   fontSize: "0.75rem",
                   fontWeight: 700,
                   padding: "0.2rem 0.55rem",
@@ -1077,7 +1081,7 @@ export default function AdminLandsPage() {
         <div
           style={{
             background: "#fff",
-            borderRadius: "1rem",
+            borderRadius: "var(--radius-lg, 1rem)",
             border: "1px solid #e2e8f0",
             overflow: "hidden",
             boxShadow: "0 1px 3px rgba(0,0,0,0.06)",
@@ -1109,7 +1113,7 @@ export default function AdminLandsPage() {
               <p
                 style={{
                   fontWeight: 700,
-                  color: "#475569",
+                  color: "var(--color-text-secondary, #475569)",
                   margin: "0 0 0.25rem",
                 }}
               >
@@ -1155,7 +1159,7 @@ export default function AdminLandsPage() {
                 <tbody>
                   {lands.map((land) => (
                     <tr
-                      key={land.id}
+                      key={land._id || land.id}
                       style={{ borderBottom: "1px solid #f8fafc" }}
                       onMouseEnter={(e) =>
                         (e.currentTarget.style.background = "#fafbff")
@@ -1236,7 +1240,7 @@ export default function AdminLandsPage() {
                         <p
                           style={{
                             fontSize: "0.8rem",
-                            color: "#475569",
+                            color: "var(--color-text-secondary, #475569)",
                             margin: 0,
                           }}
                         >
@@ -1264,7 +1268,12 @@ export default function AdminLandsPage() {
                         </span>
                       </td>
                       <td style={{ padding: "0.875rem 1rem" }}>
-                        <span style={{ fontSize: "0.78rem", color: "#475569" }}>
+                        <span
+                          style={{
+                            fontSize: "0.78rem",
+                            color: "var(--color-text-secondary, #475569)",
+                          }}
+                        >
                           {LAND_TITLES.find((t) => t.value === land.title_type)
                             ?.label || land.title_type}
                         </span>
@@ -1319,55 +1328,16 @@ export default function AdminLandsPage() {
           )}
         </div>
 
-        {totalPages > 1 && (
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              marginTop: "1rem",
-              flexWrap: "wrap",
-              gap: "0.75rem",
-            }}
-          >
-            <p style={{ fontSize: "0.8rem", color: "#94a3b8", margin: 0 }}>
-              Page {page} of {totalPages} · {total} listings
-            </p>
-            <div style={{ display: "flex", gap: "0.5rem" }}>
-              <button
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
-                disabled={page === 1}
-                style={S.pageBtn}
-              >
-                <ChevronLeft size={16} />
-              </button>
-              {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                const p = page <= 3 ? i + 1 : page - 2 + i;
-                if (p < 1 || p > totalPages) return null;
-                return (
-                  <button
-                    key={p}
-                    onClick={() => setPage(p)}
-                    style={{
-                      ...S.pageBtn,
-                      background: p === page ? "#ff6b6b" : "#fff",
-                      color: p === page ? "#fff" : "#475569",
-                    }}
-                  >
-                    {p}
-                  </button>
-                );
-              })}
-              <button
-                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                disabled={page === totalPages}
-                style={S.pageBtn}
-              >
-                <ChevronRight size={16} />
-              </button>
-            </div>
-          </div>
-        )}
+        {/* ── Pagination ── */}
+        <Pagination
+          page={page}
+          totalPages={totalPages}
+          total={total}
+          perPage={perPage}
+          onPage={setPage}
+          onPerPage={handlePerPage}
+          label="listings"
+        />
       </div>
 
       <Modal
@@ -1421,7 +1391,7 @@ export default function AdminLandsPage() {
             </div>
             <p
               style={{
-                color: "#475569",
+                color: "var(--color-text-secondary, #475569)",
                 margin: "0 0 1.5rem",
                 lineHeight: 1.6,
               }}
@@ -1496,7 +1466,7 @@ const S = {
     border: "none",
     cursor: "pointer",
     padding: "0.625rem 1.25rem",
-    borderRadius: "0.625rem",
+    borderRadius: "var(--radius, 0.625rem)",
     fontWeight: 700,
     fontSize: "0.875rem",
     display: "inline-flex",
@@ -1505,11 +1475,11 @@ const S = {
   },
   btnOutline: {
     background: "#fff",
-    color: "#475569",
+    color: "var(--color-text-secondary, #475569)",
     border: "1px solid #e2e8f0",
     cursor: "pointer",
     padding: "0.625rem 1.25rem",
-    borderRadius: "0.625rem",
+    borderRadius: "var(--radius, 0.625rem)",
     fontWeight: 600,
     fontSize: "0.875rem",
     display: "inline-flex",
@@ -1518,7 +1488,7 @@ const S = {
   },
   btnSm: {
     background: "#f1f5f9",
-    color: "#475569",
+    color: "var(--color-text-secondary, #475569)",
     border: "none",
     cursor: "pointer",
     padding: "0.5rem 0.875rem",
@@ -1528,7 +1498,7 @@ const S = {
   },
   btnIcon: {
     background: "#f8fafc",
-    color: "#475569",
+    color: "var(--color-text-secondary, #475569)",
     border: "1px solid #e2e8f0",
     cursor: "pointer",
     padding: "0.5rem 0.625rem",
@@ -1538,24 +1508,12 @@ const S = {
   },
   actionBtn: {
     background: "#f8fafc",
-    color: "#475569",
+    color: "var(--color-text-secondary, #475569)",
     border: "1px solid #e2e8f0",
     cursor: "pointer",
     padding: "0.4rem",
     borderRadius: "0.375rem",
     display: "inline-flex",
     alignItems: "center",
-  },
-  pageBtn: {
-    background: "#fff",
-    color: "#475569",
-    border: "1px solid #e2e8f0",
-    cursor: "pointer",
-    padding: "0.4rem 0.625rem",
-    borderRadius: "0.5rem",
-    display: "inline-flex",
-    alignItems: "center",
-    fontSize: "0.875rem",
-    fontWeight: 600,
   },
 };

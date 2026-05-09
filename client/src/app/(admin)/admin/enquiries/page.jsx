@@ -12,8 +12,6 @@ import {
   Loader2,
   Phone,
   Mail,
-  ChevronLeft,
-  ChevronRight,
   MessageCircle,
   CheckCircle,
   Eye,
@@ -24,21 +22,29 @@ import {
   MapPin,
   Home,
   Globe,
-  MoreHorizontal,
   Check,
   StickyNote,
   Tag,
 } from "lucide-react";
+import Pagination from "@/components/admin/Pagination";
 
 // ── Constants ─────────────────────────────────────────────────────
-const PER_PAGE = 15;
-
 const STATUS_OPTIONS = [
-  { value: "", label: "All", color: "#475569", bg: "#F1F5F9" },
+  {
+    value: "",
+    label: "All",
+    color: "var(--color-text-secondary, #475569)",
+    bg: "#F1F5F9",
+  },
   { value: "new", label: "New", color: "#16A34A", bg: "#DCFCE7" },
   { value: "read", label: "Read", color: "#0369A1", bg: "#E0F2FE" },
   { value: "replied", label: "Replied", color: "#92400E", bg: "#FEF9C3" },
-  { value: "closed", label: "Closed", color: "#64748B", bg: "#F1F5F9" },
+  {
+    value: "closed",
+    label: "Closed",
+    color: "var(--color-text-secondary, #64748B)",
+    bg: "#F1F5F9",
+  },
 ];
 
 const LISTING_ICONS = {
@@ -109,7 +115,14 @@ function StatusBadge({ status }) {
 function ListingBadge({ type }) {
   if (!type || type === "general")
     return (
-      <span style={{ color: "#94A3B8", fontSize: "0.8rem" }}>General</span>
+      <span
+        style={{
+          color: "var(--color-text-muted, #94A3B8)",
+          fontSize: "0.8rem",
+        }}
+      >
+        General
+      </span>
     );
   const colors = {
     land: ["#FEF9C3", "#92400E"],
@@ -144,7 +157,6 @@ function EnquiryModal({ enquiry, onClose, onUpdate }) {
   const [saving, setSaving] = useState(false);
   const name = fullName(enquiry);
 
-  // Auto-mark as read when opened if still "new"
   useEffect(() => {
     if (enquiry.status === "new") {
       enquiriesApi.update(getId(enquiry), { status: "read" }).catch(() => {});
@@ -186,8 +198,8 @@ function EnquiryModal({ enquiry, onClose, onUpdate }) {
     >
       <div
         style={{
-          background: "white",
-          borderRadius: "1rem",
+          background: "var(--color-surface, white)",
+          borderRadius: "var(--radius-lg, 1rem)",
           width: "100%",
           maxWidth: "580px",
           maxHeight: "90vh",
@@ -206,7 +218,7 @@ function EnquiryModal({ enquiry, onClose, onUpdate }) {
             borderBottom: "1px solid #E2E8F0",
             position: "sticky",
             top: 0,
-            background: "white",
+            background: "var(--color-surface, white)",
             zIndex: 2,
           }}
         >
@@ -241,13 +253,19 @@ function EnquiryModal({ enquiry, onClose, onUpdate }) {
                   fontFamily: "var(--font-heading)",
                   fontWeight: 700,
                   fontSize: "1rem",
-                  color: "#0F172A",
+                  color: "var(--color-text, #0F172A)",
                   margin: 0,
                 }}
               >
                 {name}
               </h3>
-              <p style={{ fontSize: "0.75rem", color: "#94A3B8", margin: 0 }}>
+              <p
+                style={{
+                  fontSize: "0.75rem",
+                  color: "var(--color-text-muted, #94A3B8)",
+                  margin: 0,
+                }}
+              >
                 {fmtDateTime(enquiry.createdAt || enquiry.created_at)}
               </p>
             </div>
@@ -260,7 +278,7 @@ function EnquiryModal({ enquiry, onClose, onUpdate }) {
                 background: "none",
                 border: "none",
                 cursor: "pointer",
-                color: "#94A3B8",
+                color: "var(--color-text-muted, #94A3B8)",
                 padding: "0.25rem",
               }}
             >
@@ -280,8 +298,8 @@ function EnquiryModal({ enquiry, onClose, onUpdate }) {
           {/* Contact card */}
           <div
             style={{
-              background: "#F8FAFC",
-              borderRadius: "0.75rem",
+              background: "var(--color-surface-2, #F8FAFC)",
+              borderRadius: "var(--radius, 0.75rem)",
               padding: "1rem 1.25rem",
               display: "grid",
               gridTemplateColumns: "1fr 1fr",
@@ -291,12 +309,18 @@ function EnquiryModal({ enquiry, onClose, onUpdate }) {
             <div
               style={{ display: "flex", alignItems: "center", gap: "0.625rem" }}
             >
-              <Phone size={14} style={{ color: "#FF6B6B", flexShrink: 0 }} />
+              <Phone
+                size={14}
+                style={{
+                  color: "var(--color-primary, #FF6B6B)",
+                  flexShrink: 0,
+                }}
+              />
               <div>
                 <p
                   style={{
                     fontSize: "0.7rem",
-                    color: "#94A3B8",
+                    color: "var(--color-text-muted, #94A3B8)",
                     margin: 0,
                     textTransform: "uppercase",
                     letterSpacing: "0.06em",
@@ -308,7 +332,7 @@ function EnquiryModal({ enquiry, onClose, onUpdate }) {
                   href={"tel:" + enquiry.phone}
                   style={{
                     fontSize: "0.875rem",
-                    color: "#0F172A",
+                    color: "var(--color-text, #0F172A)",
                     fontWeight: 600,
                     textDecoration: "none",
                   }}
@@ -325,12 +349,18 @@ function EnquiryModal({ enquiry, onClose, onUpdate }) {
                   gap: "0.625rem",
                 }}
               >
-                <Mail size={14} style={{ color: "#FF6B6B", flexShrink: 0 }} />
+                <Mail
+                  size={14}
+                  style={{
+                    color: "var(--color-primary, #FF6B6B)",
+                    flexShrink: 0,
+                  }}
+                />
                 <div>
                   <p
                     style={{
                       fontSize: "0.7rem",
-                      color: "#94A3B8",
+                      color: "var(--color-text-muted, #94A3B8)",
                       margin: 0,
                       textTransform: "uppercase",
                       letterSpacing: "0.06em",
@@ -342,7 +372,7 @@ function EnquiryModal({ enquiry, onClose, onUpdate }) {
                     href={"mailto:" + enquiry.email}
                     style={{
                       fontSize: "0.875rem",
-                      color: "#0F172A",
+                      color: "var(--color-text, #0F172A)",
                       fontWeight: 600,
                       textDecoration: "none",
                       overflow: "hidden",
@@ -360,12 +390,18 @@ function EnquiryModal({ enquiry, onClose, onUpdate }) {
             <div
               style={{ display: "flex", alignItems: "center", gap: "0.625rem" }}
             >
-              <Tag size={14} style={{ color: "#FF6B6B", flexShrink: 0 }} />
+              <Tag
+                size={14}
+                style={{
+                  color: "var(--color-primary, #FF6B6B)",
+                  flexShrink: 0,
+                }}
+              />
               <div>
                 <p
                   style={{
                     fontSize: "0.7rem",
-                    color: "#94A3B8",
+                    color: "var(--color-text-muted, #94A3B8)",
                     margin: 0,
                     textTransform: "uppercase",
                     letterSpacing: "0.06em",
@@ -376,7 +412,7 @@ function EnquiryModal({ enquiry, onClose, onUpdate }) {
                 <p
                   style={{
                     fontSize: "0.875rem",
-                    color: "#0F172A",
+                    color: "var(--color-text, #0F172A)",
                     fontWeight: 600,
                     margin: 0,
                   }}
@@ -388,12 +424,18 @@ function EnquiryModal({ enquiry, onClose, onUpdate }) {
             <div
               style={{ display: "flex", alignItems: "center", gap: "0.625rem" }}
             >
-              <Globe size={14} style={{ color: "#FF6B6B", flexShrink: 0 }} />
+              <Globe
+                size={14}
+                style={{
+                  color: "var(--color-primary, #FF6B6B)",
+                  flexShrink: 0,
+                }}
+              />
               <div>
                 <p
                   style={{
                     fontSize: "0.7rem",
-                    color: "#94A3B8",
+                    color: "var(--color-text-muted, #94A3B8)",
                     margin: 0,
                     textTransform: "uppercase",
                     letterSpacing: "0.06em",
@@ -404,7 +446,7 @@ function EnquiryModal({ enquiry, onClose, onUpdate }) {
                 <p
                   style={{
                     fontSize: "0.875rem",
-                    color: "#0F172A",
+                    color: "var(--color-text, #0F172A)",
                     fontWeight: 600,
                     margin: 0,
                     textTransform: "capitalize",
@@ -421,8 +463,8 @@ function EnquiryModal({ enquiry, onClose, onUpdate }) {
             <div
               style={{
                 padding: "0.875rem 1.125rem",
-                borderRadius: "0.75rem",
-                border: "1px solid #E2E8F0",
+                borderRadius: "var(--radius, 0.75rem)",
+                border: "1px solid var(--color-border, #E2E8F0)",
                 background: "#FAFAFA",
                 display: "flex",
                 alignItems: "center",
@@ -452,7 +494,7 @@ function EnquiryModal({ enquiry, onClose, onUpdate }) {
                 <p
                   style={{
                     fontSize: "0.7rem",
-                    color: "#94A3B8",
+                    color: "var(--color-text-muted, #94A3B8)",
                     margin: 0,
                     textTransform: "uppercase",
                     letterSpacing: "0.06em",
@@ -463,7 +505,7 @@ function EnquiryModal({ enquiry, onClose, onUpdate }) {
                 <p
                   style={{
                     fontSize: "0.875rem",
-                    color: "#0F172A",
+                    color: "var(--color-text, #0F172A)",
                     fontWeight: 600,
                     margin: 0,
                   }}
@@ -483,7 +525,7 @@ function EnquiryModal({ enquiry, onClose, onUpdate }) {
                 fontFamily: "var(--font-heading)",
                 fontWeight: 700,
                 fontSize: "0.75rem",
-                color: "#64748B",
+                color: "var(--color-text-secondary, #64748B)",
                 marginBottom: "0.5rem",
                 textTransform: "uppercase",
                 letterSpacing: "0.08em",
@@ -493,11 +535,11 @@ function EnquiryModal({ enquiry, onClose, onUpdate }) {
             </p>
             <div
               style={{
-                background: "#F8FAFC",
-                borderRadius: "0.75rem",
+                background: "var(--color-surface-2, #F8FAFC)",
+                borderRadius: "var(--radius, 0.75rem)",
                 padding: "1rem 1.25rem",
                 fontSize: "0.9375rem",
-                color: "#0F172A",
+                color: "var(--color-text, #0F172A)",
                 lineHeight: 1.75,
                 whiteSpace: "pre-wrap",
                 border: "1px solid #F1F5F9",
@@ -514,7 +556,7 @@ function EnquiryModal({ enquiry, onClose, onUpdate }) {
                 fontFamily: "var(--font-heading)",
                 fontWeight: 700,
                 fontSize: "0.75rem",
-                color: "#64748B",
+                color: "var(--color-text-secondary, #64748B)",
                 marginBottom: "0.625rem",
                 textTransform: "uppercase",
                 letterSpacing: "0.08em",
@@ -556,7 +598,7 @@ function EnquiryModal({ enquiry, onClose, onUpdate }) {
                 fontFamily: "var(--font-heading)",
                 fontWeight: 700,
                 fontSize: "0.75rem",
-                color: "#64748B",
+                color: "var(--color-text-secondary, #64748B)",
                 marginBottom: "0.5rem",
                 textTransform: "uppercase",
                 letterSpacing: "0.08em",
@@ -575,17 +617,21 @@ function EnquiryModal({ enquiry, onClose, onUpdate }) {
               style={{
                 width: "100%",
                 padding: "0.75rem",
-                borderRadius: "0.625rem",
-                border: "1px solid #E2E8F0",
+                borderRadius: "var(--radius, 0.625rem)",
+                border: "1px solid var(--color-border, #E2E8F0)",
                 fontSize: "0.875rem",
-                color: "#0F172A",
+                color: "var(--color-text, #0F172A)",
                 resize: "vertical",
                 outline: "none",
                 fontFamily: "inherit",
                 boxSizing: "border-box",
               }}
-              onFocus={(e) => (e.target.style.borderColor = "#FF6B6B")}
-              onBlur={(e) => (e.target.style.borderColor = "#E2E8F0")}
+              onFocus={(e) =>
+                (e.target.style.borderColor = "var(--color-primary, #FF6B6B)")
+              }
+              onBlur={(e) =>
+                (e.target.style.borderColor = "var(--color-border, #E2E8F0)")
+              }
             />
           </div>
 
@@ -600,7 +646,7 @@ function EnquiryModal({ enquiry, onClose, onUpdate }) {
                 alignItems: "center",
                 gap: "0.5rem",
                 padding: "0.75rem 1.25rem",
-                borderRadius: "0.75rem",
+                borderRadius: "var(--radius, 0.75rem)",
                 border: "none",
                 background: "linear-gradient(135deg, #128C7E 0%, #25D366 100%)",
                 color: "white",
@@ -623,7 +669,7 @@ function EnquiryModal({ enquiry, onClose, onUpdate }) {
                 justifyContent: "center",
                 gap: "0.5rem",
                 padding: "0.75rem 1.25rem",
-                borderRadius: "0.75rem",
+                borderRadius: "var(--radius, 0.75rem)",
                 border: "none",
                 background: saving
                   ? "rgba(255,107,107,0.5)"
@@ -703,6 +749,7 @@ export default function EnquiriesPage() {
   const [total, setTotal] = useState(0);
   const [newCount, setNewCount] = useState(0);
   const [page, setPage] = useState(1);
+  const [perPage, setPerPage] = useState(15);
   const [totalPages, setTotalPages] = useState(1);
   const [filterStatus, setFilterStatus] = useState("");
   const [search, setSearch] = useState("");
@@ -714,10 +761,10 @@ export default function EnquiriesPage() {
   const [bulkLoading, setBulkLoading] = useState(false);
 
   const fetchData = useCallback(
-    async (p = page, status = filterStatus, q = search) => {
+    async (p = page, status = filterStatus, q = search, pp = perPage) => {
       setLoading(true);
       try {
-        const params = { page: p, perPage: PER_PAGE };
+        const params = { page: p, perPage: pp };
         if (status) params.status = status;
         if (q) params.q = q;
         const res = await enquiriesApi.adminGetAll(params);
@@ -725,7 +772,6 @@ export default function EnquiriesPage() {
         setTotal(res.total || 0);
         setTotalPages(res.totalPages || 1);
         setPage(p);
-        // Count "new" for sidebar badge
         setNewCount(
           res.newCount ??
             (res.data || []).filter((e) => e.status === "new").length,
@@ -737,12 +783,13 @@ export default function EnquiriesPage() {
         setChecked(new Set());
       }
     },
-    [page, filterStatus, search],
+    [page, filterStatus, search, perPage],
   );
 
   useEffect(() => {
-    fetchData(1, filterStatus, search);
+    fetchData(1, filterStatus, search, perPage);
   }, [filterStatus]);
+
   useEffect(() => {
     fetchData(1);
   }, []);
@@ -752,7 +799,16 @@ export default function EnquiriesPage() {
   const handleSearch = (v) => {
     setSearch(v);
     clearTimeout(searchTimer.current);
-    searchTimer.current = setTimeout(() => fetchData(1, filterStatus, v), 400);
+    searchTimer.current = setTimeout(
+      () => fetchData(1, filterStatus, v, perPage),
+      400,
+    );
+  };
+
+  // ── perPage change ────────────────────────────────────────────
+  const handlePerPage = (n) => {
+    setPerPage(n);
+    fetchData(1, filterStatus, search, n);
   };
 
   // ── Delete ────────────────────────────────────────────────────
@@ -765,7 +821,7 @@ export default function EnquiriesPage() {
     try {
       await enquiriesApi.delete(getId(enquiry));
       toast.success("Enquiry deleted");
-      fetchData(page);
+      fetchData(page, filterStatus, search, perPage);
     } catch (err) {
       toast.error(err.message || "Delete failed");
     } finally {
@@ -797,7 +853,7 @@ export default function EnquiriesPage() {
         [...checked].map((id) => enquiriesApi.update(id, { status: "read" })),
       );
       toast.success(`${checked.size} enquiries marked as read`);
-      fetchData(page);
+      fetchData(page, filterStatus, search, perPage);
     } catch {
       toast.error("Bulk update failed");
     } finally {
@@ -813,12 +869,6 @@ export default function EnquiriesPage() {
     exportCSV(rows);
     toast.success(`Exported ${rows.length} rows`);
   };
-
-  // ── Status counts for tabs ────────────────────────────────────
-  const statusCounts = enquiries.reduce((acc, e) => {
-    acc[e.status] = (acc[e.status] || 0) + 1;
-    return acc;
-  }, {});
 
   return (
     <AdminShell newEnquiries={newCount}>
@@ -843,13 +893,16 @@ export default function EnquiriesPage() {
                 marginBottom: "0.25rem",
               }}
             >
-              <MessageSquare size={20} style={{ color: "#FF6B6B" }} />
+              <MessageSquare
+                size={20}
+                style={{ color: "var(--color-primary, #FF6B6B)" }}
+              />
               <h1
                 style={{
                   fontFamily: "var(--font-heading)",
                   fontWeight: 800,
                   fontSize: "1.5rem",
-                  color: "#0F172A",
+                  color: "var(--color-text, #0F172A)",
                   margin: 0,
                 }}
               >
@@ -857,8 +910,8 @@ export default function EnquiriesPage() {
               </h1>
               <span
                 style={{
-                  background: "#F1F5F9",
-                  color: "#475569",
+                  background: "var(--color-surface-3, #F1F5F9)",
+                  color: "var(--color-text-secondary, #475569)",
                   fontSize: "0.75rem",
                   fontWeight: 700,
                   padding: "0.2rem 0.55rem",
@@ -885,7 +938,13 @@ export default function EnquiriesPage() {
                 </span>
               )}
             </div>
-            <p style={{ color: "#94A3B8", fontSize: "0.875rem", margin: 0 }}>
+            <p
+              style={{
+                color: "var(--color-text-muted, #94A3B8)",
+                fontSize: "0.875rem",
+                margin: 0,
+              }}
+            >
               Manage customer enquiries and leads
             </p>
           </div>
@@ -897,10 +956,10 @@ export default function EnquiriesPage() {
                 alignItems: "center",
                 gap: "0.5rem",
                 padding: "0.5rem 1rem",
-                borderRadius: "0.625rem",
-                border: "1px solid #E2E8F0",
-                background: "white",
-                color: "#475569",
+                borderRadius: "var(--radius, 0.625rem)",
+                border: "1px solid var(--color-border, #E2E8F0)",
+                background: "var(--color-surface, white)",
+                color: "var(--color-text-secondary, #475569)",
                 fontFamily: "var(--font-heading)",
                 fontWeight: 600,
                 fontSize: "0.8125rem",
@@ -911,16 +970,16 @@ export default function EnquiriesPage() {
               {checked.size ? `(${checked.size})` : "CSV"}
             </button>
             <button
-              onClick={() => fetchData(page)}
+              onClick={() => fetchData(page, filterStatus, search, perPage)}
               style={{
                 display: "flex",
                 alignItems: "center",
                 gap: "0.5rem",
                 padding: "0.5rem 1rem",
-                borderRadius: "0.625rem",
-                border: "1px solid #E2E8F0",
-                background: "white",
-                color: "#475569",
+                borderRadius: "var(--radius, 0.625rem)",
+                border: "1px solid var(--color-border, #E2E8F0)",
+                background: "var(--color-surface, white)",
+                color: "var(--color-text-secondary, #475569)",
                 fontFamily: "var(--font-heading)",
                 fontWeight: 600,
                 fontSize: "0.8125rem",
@@ -984,7 +1043,7 @@ export default function EnquiriesPage() {
                 left: "0.75rem",
                 top: "50%",
                 transform: "translateY(-50%)",
-                color: "#94A3B8",
+                color: "var(--color-text-muted, #94A3B8)",
               }}
             />
             <input
@@ -997,10 +1056,10 @@ export default function EnquiriesPage() {
                 paddingTop: "0.5rem",
                 paddingBottom: "0.5rem",
                 borderRadius: "9999px",
-                border: "1px solid #E2E8F0",
+                border: "1px solid var(--color-border, #E2E8F0)",
                 fontSize: "0.8125rem",
                 outline: "none",
-                color: "#0F172A",
+                color: "var(--color-text, #0F172A)",
                 width: "240px",
               }}
             />
@@ -1008,7 +1067,7 @@ export default function EnquiriesPage() {
               <button
                 onClick={() => {
                   setSearch("");
-                  fetchData(1, filterStatus, "");
+                  fetchData(1, filterStatus, "", perPage);
                 }}
                 style={{
                   position: "absolute",
@@ -1018,7 +1077,7 @@ export default function EnquiriesPage() {
                   background: "none",
                   border: "none",
                   cursor: "pointer",
-                  color: "#94A3B8",
+                  color: "var(--color-text-muted, #94A3B8)",
                   padding: 0,
                 }}
               >
@@ -1036,7 +1095,7 @@ export default function EnquiriesPage() {
               alignItems: "center",
               gap: "0.75rem",
               padding: "0.75rem 1.25rem",
-              borderRadius: "0.75rem",
+              borderRadius: "var(--radius, 0.75rem)",
               background: "#EFF6FF",
               border: "1px solid #BFDBFE",
               marginBottom: "1rem",
@@ -1088,7 +1147,7 @@ export default function EnquiriesPage() {
                 padding: "0.375rem 0.875rem",
                 borderRadius: "0.5rem",
                 border: "1px solid #BFDBFE",
-                background: "white",
+                background: "var(--color-surface, white)",
                 color: "#1D4ED8",
                 fontFamily: "var(--font-heading)",
                 fontWeight: 600,
@@ -1105,7 +1164,7 @@ export default function EnquiriesPage() {
                 background: "none",
                 border: "none",
                 cursor: "pointer",
-                color: "#64748B",
+                color: "var(--color-text-secondary, #64748B)",
               }}
             >
               <X size={14} />
@@ -1116,9 +1175,9 @@ export default function EnquiriesPage() {
         {/* Table */}
         <div
           style={{
-            background: "white",
-            borderRadius: "1rem",
-            border: "1px solid #E2E8F0",
+            background: "var(--color-surface, white)",
+            borderRadius: "var(--radius-lg, 1rem)",
+            border: "1px solid var(--color-border, #E2E8F0)",
             overflow: "hidden",
             boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
           }}
@@ -1128,13 +1187,19 @@ export default function EnquiriesPage() {
               <Loader2
                 size={28}
                 style={{
-                  color: "#FF6B6B",
+                  color: "var(--color-primary, #FF6B6B)",
                   animation: "spin 1s linear infinite",
                   margin: "0 auto 0.75rem",
                   display: "block",
                 }}
               />
-              <p style={{ color: "#94A3B8", margin: 0, fontSize: "0.875rem" }}>
+              <p
+                style={{
+                  color: "var(--color-text-muted, #94A3B8)",
+                  margin: 0,
+                  fontSize: "0.875rem",
+                }}
+              >
                 Loading enquiries…
               </p>
             </div>
@@ -1152,13 +1217,19 @@ export default function EnquiriesPage() {
                 style={{
                   fontFamily: "var(--font-heading)",
                   fontWeight: 700,
-                  color: "#475569",
+                  color: "var(--color-text-secondary, #475569)",
                   margin: "0 0 0.25rem",
                 }}
               >
                 No enquiries found
               </p>
-              <p style={{ margin: 0, fontSize: "0.875rem", color: "#94A3B8" }}>
+              <p
+                style={{
+                  margin: 0,
+                  fontSize: "0.875rem",
+                  color: "var(--color-text-muted, #94A3B8)",
+                }}
+              >
                 Try a different filter
               </p>
             </div>
@@ -1169,10 +1240,9 @@ export default function EnquiriesPage() {
                   <tr
                     style={{
                       borderBottom: "1px solid #F1F5F9",
-                      background: "#F8FAFC",
+                      background: "var(--color-surface-2, #F8FAFC)",
                     }}
                   >
-                    {/* Checkbox column */}
                     <th
                       style={{ padding: "0.75rem 0.875rem", width: "2.5rem" }}
                     >
@@ -1211,7 +1281,7 @@ export default function EnquiriesPage() {
                           fontSize: "0.68rem",
                           fontFamily: "var(--font-heading)",
                           fontWeight: 700,
-                          color: "#94A3B8",
+                          color: "var(--color-text-muted, #94A3B8)",
                           textTransform: "uppercase",
                           letterSpacing: "0.06em",
                           whiteSpace: "nowrap",
@@ -1251,7 +1321,6 @@ export default function EnquiriesPage() {
                               : "transparent";
                         }}
                       >
-                        {/* Checkbox */}
                         <td style={{ padding: "0.875rem 0.875rem" }}>
                           <button
                             onClick={() => toggleOne(id)}
@@ -1270,8 +1339,6 @@ export default function EnquiriesPage() {
                             )}
                           </button>
                         </td>
-
-                        {/* Customer */}
                         <td style={{ padding: "0.875rem 1rem" }}>
                           <div
                             style={{
@@ -1309,7 +1376,7 @@ export default function EnquiriesPage() {
                                   fontFamily: "var(--font-heading)",
                                   fontWeight: 600,
                                   fontSize: "0.875rem",
-                                  color: "#0F172A",
+                                  color: "var(--color-text, #0F172A)",
                                   margin: 0,
                                   whiteSpace: "nowrap",
                                 }}
@@ -1333,13 +1400,11 @@ export default function EnquiriesPage() {
                             </div>
                           </div>
                         </td>
-
-                        {/* Contact */}
                         <td style={{ padding: "0.875rem 1rem" }}>
                           <p
                             style={{
                               fontSize: "0.8125rem",
-                              color: "#0F172A",
+                              color: "var(--color-text, #0F172A)",
                               margin: 0,
                               fontWeight: 600,
                               whiteSpace: "nowrap",
@@ -1351,7 +1416,7 @@ export default function EnquiriesPage() {
                             <p
                               style={{
                                 fontSize: "0.75rem",
-                                color: "#94A3B8",
+                                color: "var(--color-text-muted, #94A3B8)",
                                 margin: 0,
                                 maxWidth: "160px",
                                 overflow: "hidden",
@@ -1363,66 +1428,55 @@ export default function EnquiriesPage() {
                             </p>
                           )}
                         </td>
-
-                        {/* Type */}
                         <td style={{ padding: "0.875rem 1rem" }}>
                           <span
                             style={{
                               fontSize: "0.8125rem",
-                              color: "#475569",
+                              color: "var(--color-text-secondary, #475569)",
                               whiteSpace: "nowrap",
                             }}
                           >
                             {e.inquiry_type || "General"}
                           </span>
                         </td>
-
-                        {/* Listing */}
                         <td style={{ padding: "0.875rem 1rem" }}>
                           <ListingBadge type={e.listing_type} />
                         </td>
-
-                        {/* Source */}
                         <td style={{ padding: "0.875rem 1rem" }}>
                           <span
                             style={{
                               fontSize: "0.8rem",
-                              color: "#64748B",
+                              color: "var(--color-text-secondary, #64748B)",
                               textTransform: "capitalize",
                             }}
                           >
                             {(e.source || "website").replace(/_/g, " ")}
                           </span>
                         </td>
-
-                        {/* Status */}
                         <td style={{ padding: "0.875rem 1rem" }}>
                           <StatusBadge status={e.status} />
                         </td>
-
-                        {/* Date */}
                         <td style={{ padding: "0.875rem 1rem" }}>
                           <span
                             style={{
                               fontSize: "0.8rem",
-                              color: "#94A3B8",
+                              color: "var(--color-text-muted, #94A3B8)",
                               whiteSpace: "nowrap",
                             }}
                           >
                             {fmtDate(e.createdAt || e.created_at)}
                           </span>
                         </td>
-
-                        {/* Actions */}
                         <td style={{ padding: "0.875rem 1rem" }}>
                           <div style={{ display: "flex", gap: "0.375rem" }}>
                             <button
                               onClick={() => setSelected(e)}
                               title="View"
                               style={{
-                                background: "#F8FAFC",
-                                color: "#475569",
-                                border: "1px solid #E2E8F0",
+                                background: "var(--color-surface-2, #F8FAFC)",
+                                color: "var(--color-text-secondary, #475569)",
+                                border:
+                                  "1px solid var(--color-border, #E2E8F0)",
                                 cursor: "pointer",
                                 padding: "0.4rem",
                                 borderRadius: "0.375rem",
@@ -1487,74 +1541,23 @@ export default function EnquiriesPage() {
           )}
         </div>
 
-        {/* Pagination */}
-        {totalPages > 1 && (
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              marginTop: "1rem",
-              flexWrap: "wrap",
-              gap: "0.75rem",
-            }}
-          >
-            <p style={{ fontSize: "0.8rem", color: "#94A3B8", margin: 0 }}>
-              Page {page} of {totalPages} — {total} total
-            </p>
-            <div style={{ display: "flex", gap: "0.5rem" }}>
-              <button
-                onClick={() => fetchData(page - 1)}
-                disabled={page === 1}
-                style={{
-                  background: "white",
-                  color: "#475569",
-                  border: "1px solid #E2E8F0",
-                  cursor: page === 1 ? "not-allowed" : "pointer",
-                  opacity: page === 1 ? 0.4 : 1,
-                  padding: "0.4rem 0.75rem",
-                  borderRadius: "0.5rem",
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: "0.25rem",
-                  fontSize: "0.8125rem",
-                  fontFamily: "var(--font-heading)",
-                  fontWeight: 600,
-                }}
-              >
-                <ChevronLeft size={15} /> Prev
-              </button>
-              <button
-                onClick={() => fetchData(page + 1)}
-                disabled={page === totalPages}
-                style={{
-                  background: "white",
-                  color: "#475569",
-                  border: "1px solid #E2E8F0",
-                  cursor: page === totalPages ? "not-allowed" : "pointer",
-                  opacity: page === totalPages ? 0.4 : 1,
-                  padding: "0.4rem 0.75rem",
-                  borderRadius: "0.5rem",
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: "0.25rem",
-                  fontSize: "0.8125rem",
-                  fontFamily: "var(--font-heading)",
-                  fontWeight: 600,
-                }}
-              >
-                Next <ChevronRight size={15} />
-              </button>
-            </div>
-          </div>
-        )}
+        {/* ── Pagination ── */}
+        <Pagination
+          page={page}
+          totalPages={totalPages}
+          total={total}
+          perPage={perPage}
+          onPage={(p) => fetchData(p, filterStatus, search, perPage)}
+          onPerPage={handlePerPage}
+          label="enquiries"
+        />
       </div>
 
       {selected && (
         <EnquiryModal
           enquiry={selected}
           onClose={() => setSelected(null)}
-          onUpdate={() => fetchData(page)}
+          onUpdate={() => fetchData(page, filterStatus, search, perPage)}
         />
       )}
 

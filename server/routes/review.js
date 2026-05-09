@@ -4,6 +4,10 @@ const router = require("express").Router();
 const Review = require("../models/Review");
 const { ok, created, fail } = require("../lib/helpers");
 const { requireAuth } = require("../middleware/auth");
+const { revalidate } = require("../lib/revalidate");
+
+// Reviews only affect the homepage Testimonials section
+const REVIEW_PATHS = ["/"];
 
 // ── GET /reviews — public ─────────────────────────────────────────
 // Returns only active reviews, ordered by sort_order then createdAt.
@@ -51,6 +55,7 @@ router.post("/admin/reviews", requireAuth, async (req, res, next) => {
       is_active: is_active !== false,
       sort_order: parseInt(sort_order) || 0,
     });
+    revalidate(REVIEW_PATHS);
     return created(res, doc, "Review created");
   } catch (err) {
     next(err);
@@ -78,6 +83,7 @@ router.put("/admin/reviews/:id", requireAuth, async (req, res, next) => {
       { new: true, runValidators: true },
     ).lean();
     if (!doc) return fail(res, "Review not found", 404);
+    revalidate(REVIEW_PATHS);
     return ok(res, doc, "Review updated");
   } catch (err) {
     next(err);
@@ -89,6 +95,7 @@ router.delete("/admin/reviews/:id", requireAuth, async (req, res, next) => {
   try {
     const doc = await Review.findByIdAndDelete(req.params.id);
     if (!doc) return fail(res, "Review not found", 404);
+    revalidate(REVIEW_PATHS);
     return ok(res, null, "Review deleted");
   } catch (err) {
     next(err);

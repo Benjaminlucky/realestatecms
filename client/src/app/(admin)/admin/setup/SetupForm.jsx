@@ -1,5 +1,7 @@
 "use client";
 
+import { API_URL } from "@/config/site";
+
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
@@ -121,6 +123,17 @@ export default function SetupForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [done, setDone] = useState(false);
+  const [siteName, setSiteName] = useState("");
+
+  useEffect(() => {
+    fetch(`${API_URL}/settings`)
+      .then((r) => r.json())
+      .then((json) => {
+        const name = json?.data?.settings?.site_name;
+        if (name) setSiteName(name);
+      })
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     if (!authLoading && isAuthenticated) {
@@ -368,7 +381,7 @@ export default function SetupForm() {
                   letterSpacing: "-0.02em",
                 }}
               >
-                Welcome to NaijaRealty
+                Welcome to {siteName || "Admin"}
               </h1>
               <p
                 style={{

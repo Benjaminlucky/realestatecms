@@ -1,7 +1,5 @@
 import { serverFetch } from "@/lib/api";
-import { SITE_CONFIG } from "@/config/site";
-import Navbar from "@/components/layout/Navbar";
-import Footer from "@/components/layout/Footer";
+import { SITE_CONFIG, SITE_URL } from "@/config/site";
 import HomeClient from "./Homeclient";
 
 export const revalidate = 300;
@@ -14,10 +12,23 @@ export async function generateMetadata() {
     const description =
       s.hero_subtext ||
       "Find your perfect property across Nigeria. Verified listings, transparent pricing, trusted agents.";
+    const ogImage = `${SITE_URL}/api/og?title=${encodeURIComponent(siteName + " — Premium Properties")}&subtitle=Lands+%26+Houses+Across+Nigeria&type=default&site=${encodeURIComponent(siteName)}`;
     return {
       title: `${siteName} — Lands, Houses & Real Estate Investment`,
       description,
-      openGraph: { title: siteName, description },
+      alternates: { canonical: SITE_URL },
+      openGraph: {
+        title: `${siteName} — Lands, Houses & Real Estate Investment`,
+        description,
+        url: SITE_URL,
+        images: [{ url: ogImage, width: 1200, height: 630 }],
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: `${siteName} — Lands, Houses & Real Estate Investment`,
+        description,
+        images: [ogImage],
+      },
     };
   } catch {
     return { title: SITE_CONFIG.name };
@@ -31,12 +42,16 @@ export default async function HomePage() {
     featuredHousesRes,
     publicStatsRes,
     reviewsRes,
+    popularAreasRes,
+    partnersRes,
   ] = await Promise.allSettled([
     serverFetch("/settings", { next: { revalidate: 300 } }),
     serverFetch("/lands/featured?limit=6", { next: { revalidate: 300 } }),
     serverFetch("/houses/featured?limit=6", { next: { revalidate: 300 } }),
     serverFetch("/stats/public", { next: { revalidate: 300 } }),
     serverFetch("/reviews?limit=20", { next: { revalidate: 300 } }),
+    serverFetch("/popular-areas", { next: { revalidate: 300 } }),
+    serverFetch("/partners", { next: { revalidate: 300 } }),
   ]);
 
   const settings =
@@ -59,24 +74,26 @@ export default async function HomePage() {
       ? publicStatsRes.value?.data || null
       : null;
 
-  // Live reviews from DB — Testimonials falls back to hardcoded
-  // defaults automatically when this array is empty
   const testimonials =
     reviewsRes.status === "fulfilled" ? reviewsRes.value?.data || [] : [];
 
+  const popularAreas =
+    popularAreasRes.status === "fulfilled"
+      ? popularAreasRes.value?.data || []
+      : [];
+
+  const partners =
+    partnersRes.status === "fulfilled" ? partnersRes.value?.data || [] : [];
+
   return (
-    <>
-      <Navbar settings={settings} />
-      <main>
-        <HomeClient
-          lands={lands}
-          houses={houses}
-          settings={settings}
-          publicStats={publicStats}
-          testimonials={testimonials}
-        />
-      </main>
-      <Footer settings={settings} />
-    </>
+    <HomeClient
+      lands={lands}
+      houses={houses}
+      settings={settings}
+      publicStats={publicStats}
+      testimonials={testimonials}
+      popularAreas={popularAreas}
+      partners={partners}
+    />
   );
 }

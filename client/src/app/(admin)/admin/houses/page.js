@@ -125,7 +125,7 @@ function ImageUpload({ label, value, onChange, folder = "houses" }) {
         onClick={() => !uploading && ref.current?.click()}
         style={{
           border: `2px dashed ${url ? "#22c55e" : "#e2e8f0"}`,
-          borderRadius: "0.75rem",
+          borderRadius: "var(--radius, 0.75rem)",
           padding: url ? "0.5rem" : "2rem 1rem",
           textAlign: "center",
           cursor: uploading ? "wait" : "pointer",
@@ -249,7 +249,7 @@ function ImageUpload({ label, value, onChange, folder = "houses" }) {
                 margin: "0 0 0.25rem",
                 fontWeight: 600,
                 fontSize: "0.875rem",
-                color: "#475569",
+                color: "var(--color-text-secondary, #475569)",
               }}
             >
               Click to upload
@@ -469,7 +469,7 @@ function Modal({ open, onClose, title, children, wide }) {
       <div
         style={{
           background: "#fff",
-          borderRadius: "1rem",
+          borderRadius: "var(--radius-lg, 1rem)",
           width: "100%",
           maxWidth: wide ? "820px" : "480px",
           maxHeight: "90vh",
@@ -965,7 +965,7 @@ export default function AdminHousesPage() {
               <span
                 style={{
                   background: "#f1f5f9",
-                  color: "#475569",
+                  color: "var(--color-text-secondary, #475569)",
                   fontSize: "0.75rem",
                   fontWeight: 700,
                   padding: "0.2rem 0.55rem",
@@ -1067,7 +1067,7 @@ export default function AdminHousesPage() {
         <div
           style={{
             background: "#fff",
-            borderRadius: "1rem",
+            borderRadius: "var(--radius-lg, 1rem)",
             border: "1px solid #e2e8f0",
             overflow: "hidden",
             boxShadow: "0 1px 3px rgba(0,0,0,0.06)",
@@ -1099,7 +1099,7 @@ export default function AdminHousesPage() {
               <p
                 style={{
                   fontWeight: 700,
-                  color: "#475569",
+                  color: "var(--color-text-secondary, #475569)",
                   margin: "0 0 0.25rem",
                 }}
               >
@@ -1213,7 +1213,7 @@ export default function AdminHousesPage() {
                         <p
                           style={{
                             fontSize: "0.8rem",
-                            color: "#475569",
+                            color: "var(--color-text-secondary, #475569)",
                             margin: 0,
                           }}
                         >
@@ -1262,7 +1262,7 @@ export default function AdminHousesPage() {
                                 alignItems: "center",
                                 gap: "0.25rem",
                                 fontSize: "0.8rem",
-                                color: "#475569",
+                                color: "var(--color-text-secondary, #475569)",
                               }}
                             >
                               <BedDouble size={13} /> {house.bedrooms}
@@ -1275,7 +1275,7 @@ export default function AdminHousesPage() {
                                 alignItems: "center",
                                 gap: "0.25rem",
                                 fontSize: "0.8rem",
-                                color: "#475569",
+                                color: "var(--color-text-secondary, #475569)",
                               }}
                             >
                               <Bath size={13} /> {house.bathrooms}
@@ -1284,7 +1284,12 @@ export default function AdminHousesPage() {
                         </div>
                       </td>
                       <td style={{ padding: "0.875rem 1rem" }}>
-                        <span style={{ fontSize: "0.78rem", color: "#475569" }}>
+                        <span
+                          style={{
+                            fontSize: "0.78rem",
+                            color: "var(--color-text-secondary, #475569)",
+                          }}
+                        >
                           {HOUSE_CATEGORIES.find(
                             (c) => c.value === house.category,
                           )?.label || house.category}
@@ -1437,7 +1442,7 @@ export default function AdminHousesPage() {
             </div>
             <p
               style={{
-                color: "#475569",
+                color: "var(--color-text-secondary, #475569)",
                 margin: "0 0 1.5rem",
                 lineHeight: 1.6,
               }}
@@ -1510,7 +1515,7 @@ const S = {
     border: "none",
     cursor: "pointer",
     padding: "0.625rem 1.25rem",
-    borderRadius: "0.625rem",
+    borderRadius: "var(--radius, 0.625rem)",
     fontWeight: 700,
     fontSize: "0.875rem",
     display: "inline-flex",
@@ -1519,11 +1524,11 @@ const S = {
   },
   btnOutline: {
     background: "#fff",
-    color: "#475569",
+    color: "var(--color-text-secondary, #475569)",
     border: "1px solid #e2e8f0",
     cursor: "pointer",
     padding: "0.625rem 1.25rem",
-    borderRadius: "0.625rem",
+    borderRadius: "var(--radius, 0.625rem)",
     fontWeight: 600,
     fontSize: "0.875rem",
     display: "inline-flex",
@@ -1532,7 +1537,7 @@ const S = {
   },
   btnSm: {
     background: "#f1f5f9",
-    color: "#475569",
+    color: "var(--color-text-secondary, #475569)",
     border: "none",
     cursor: "pointer",
     padding: "0.5rem 0.875rem",
@@ -1542,7 +1547,7 @@ const S = {
   },
   btnIcon: {
     background: "#f8fafc",
-    color: "#475569",
+    color: "var(--color-text-secondary, #475569)",
     border: "1px solid #e2e8f0",
     cursor: "pointer",
     padding: "0.5rem 0.625rem",
@@ -1552,7 +1557,7 @@ const S = {
   },
   actionBtn: {
     background: "#f8fafc",
-    color: "#475569",
+    color: "var(--color-text-secondary, #475569)",
     border: "1px solid #e2e8f0",
     cursor: "pointer",
     padding: "0.4rem",
@@ -1562,7 +1567,7 @@ const S = {
   },
   pageBtn: {
     background: "#fff",
-    color: "#475569",
+    color: "var(--color-text-secondary, #475569)",
     border: "1px solid #e2e8f0",
     cursor: "pointer",
     padding: "0.4rem 0.625rem",

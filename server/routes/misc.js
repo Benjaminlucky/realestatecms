@@ -13,11 +13,13 @@ const {
 const { requireAuth, requireSuperAdmin } = require("../middleware/auth");
 const { upload } = require("../middleware/upload");
 const { Enquiry, Setting, Media } = require("../models/Misc");
+const { PopularArea, Partner } = require("../models/Homepage");
 const Admin = require("../models/Admin");
 const Land = require("../models/Land");
 const House = require("../models/House");
 const { BlogPost } = require("../models/Blog");
 const { sendEnquiryNotification } = require("../services/email");
+const { revalidate } = require("../lib/revalidate");
 
 // ══════════════════════════════════════════════════════════════════
 // ENQUIRIES
@@ -196,6 +198,37 @@ router.delete("/admin/enquiries/:id", requireAuth, async (req, res, next) => {
     const doc = await Enquiry.findByIdAndDelete(req.params.id);
     if (!doc) return fail(res, "Enquiry not found", 404);
     return ok(res, null, "Enquiry deleted");
+  } catch (err) {
+    next(err);
+  }
+});
+
+// ══════════════════════════════════════════════════════════════════
+// ABOUT PAGE
+// ══════════════════════════════════════════════════════════════════
+
+// GET /about — public, ISR-cached by Next.js
+router.get("/about", async (req, res, next) => {
+  try {
+    const doc = await Setting.findOne({ key: "about_page" }).lean();
+    const data = doc?.value ? JSON.parse(doc.value) : {};
+    return ok(res, data);
+  } catch (err) {
+    next(err);
+  }
+});
+
+// PUT /admin/about — protected, saves the full about page JSON blob
+router.put("/admin/about", requireAuth, async (req, res, next) => {
+  try {
+    const value = JSON.stringify(req.body);
+    await Setting.findOneAndUpdate(
+      { key: "about_page" },
+      { key: "about_page", value, group_name: "about" },
+      { upsert: true, new: true },
+    );
+    revalidate(["/about"]);
+    return ok(res, null, "About page saved");
   } catch (err) {
     next(err);
   }
@@ -529,19 +562,25 @@ router.post(
       const {
         first_name,
         last_name,
+        name,
         email,
         password,
         role = "admin",
       } = req.body;
-      if (!first_name || !email || !password) {
+
+      // Accept either a pre-combined `name` field or separate first/last
+      const resolvedName =
+        name?.trim() ||
+        [first_name?.trim(), last_name?.trim()].filter(Boolean).join(" ");
+
+      if (!resolvedName || !email || !password) {
         return fail(res, "Name, email, and password are required");
       }
       const existing = await Admin.findOne({ email: email.toLowerCase() });
       if (existing) return fail(res, "Email already in use", 409);
 
       const member = await Admin.create({
-        first_name,
-        last_name,
+        name: resolvedName,
         email,
         password,
         role,
@@ -557,12 +596,25 @@ router.post(
 // PUT /admin/team/:id
 router.put("/admin/team/:id", requireAuth, async (req, res, next) => {
   try {
-    const { first_name, last_name, email, role, phone, bio } = req.body;
-    const member = await Admin.findByIdAndUpdate(
-      req.params.id,
-      { first_name, last_name, email, role, phone, bio },
-      { new: true, runValidators: true },
-    ).lean();
+    const { first_name, last_name, name, email, role, phone, bio } = req.body;
+
+    // Accept either a pre-combined `name` field or separate first/last
+    const resolvedName =
+      name?.trim() ||
+      [first_name?.trim(), last_name?.trim()].filter(Boolean).join(" ") ||
+      undefined;
+
+    const update = {};
+    if (resolvedName) update.name = resolvedName;
+    if (email !== undefined) update.email = email;
+    if (role !== undefined) update.role = role;
+    if (phone !== undefined) update.phone = phone;
+    if (bio !== undefined) update.bio = bio;
+
+    const member = await Admin.findByIdAndUpdate(req.params.id, update, {
+      new: true,
+      runValidators: true,
+    }).lean();
     if (!member) return fail(res, "Team member not found", 404);
     return ok(res, member, "Updated");
   } catch (err) {
@@ -612,5 +664,220 @@ router.delete(
     }
   },
 );
+
+// ══════════════════════════════════════════════════════════════════
+// POPULAR AREAS
+// ══════════════════════════════════════════════════════════════════
+
+// GET /popular-areas — public, returns only active areas ordered by sort_order
+router.get("/popular-areas", async (req, res, next) => {
+  try {
+    const areas = await PopularArea.find({ is_active: true })
+      .sort({ sort_order: 1, createdAt: 1 })
+      .lean();
+    return ok(res, areas);
+  } catch (err) {
+    next(err);
+  }
+});
+
+// GET /admin/popular-areas — all areas including inactive
+router.get("/admin/popular-areas", requireAuth, async (req, res, next) => {
+  try {
+    const areas = await PopularArea.find({})
+      .sort({ sort_order: 1, createdAt: 1 })
+      .lean();
+    return ok(res, areas);
+  } catch (err) {
+    next(err);
+  }
+});
+
+// POST /admin/popular-areas
+router.post(
+  "/admin/popular-areas",
+  requireAuth,
+  upload.single("image"),
+  async (req, res, next) => {
+    try {
+      const { name, location, count, link_path, sort_order, is_active } =
+        req.body;
+      if (!name?.trim()) return fail(res, "Name is required");
+      if (!location?.trim()) return fail(res, "Location is required");
+
+      const image_url = req.file ? req.file.path : req.body.image_url || "";
+
+      const area = await PopularArea.create({
+        name: name.trim(),
+        location: location.trim(),
+        count: count?.trim() || "",
+        link_path: link_path?.trim() || "",
+        image_url,
+        sort_order: parseInt(sort_order) || 0,
+        is_active: is_active !== "false" && is_active !== false,
+      });
+
+      revalidate(["/"]);
+      return created(res, area, "Popular area created");
+    } catch (err) {
+      next(err);
+    }
+  },
+);
+
+// PUT /admin/popular-areas/:id
+router.put(
+  "/admin/popular-areas/:id",
+  requireAuth,
+  upload.single("image"),
+  async (req, res, next) => {
+    try {
+      const { name, location, count, link_path, sort_order, is_active } =
+        req.body;
+
+      const update = {};
+      if (name !== undefined) update.name = name.trim();
+      if (location !== undefined) update.location = location.trim();
+      if (count !== undefined) update.count = count.trim();
+      if (link_path !== undefined) update.link_path = link_path.trim();
+      if (sort_order !== undefined)
+        update.sort_order = parseInt(sort_order) || 0;
+      if (is_active !== undefined)
+        update.is_active = is_active !== "false" && is_active !== false;
+      if (req.file) update.image_url = req.file.path;
+      else if (req.body.image_url !== undefined)
+        update.image_url = req.body.image_url;
+
+      const area = await PopularArea.findByIdAndUpdate(req.params.id, update, {
+        new: true,
+        runValidators: true,
+      }).lean();
+      if (!area) return fail(res, "Area not found", 404);
+
+      revalidate(["/"]);
+      return ok(res, area, "Popular area updated");
+    } catch (err) {
+      next(err);
+    }
+  },
+);
+
+// DELETE /admin/popular-areas/:id
+router.delete(
+  "/admin/popular-areas/:id",
+  requireAuth,
+  async (req, res, next) => {
+    try {
+      const area = await PopularArea.findByIdAndDelete(req.params.id);
+      if (!area) return fail(res, "Area not found", 404);
+      revalidate(["/"]);
+      return ok(res, null, "Popular area deleted");
+    } catch (err) {
+      next(err);
+    }
+  },
+);
+
+// ══════════════════════════════════════════════════════════════════
+// PARTNERS
+// ══════════════════════════════════════════════════════════════════
+
+// GET /partners — public, active only
+router.get("/partners", async (req, res, next) => {
+  try {
+    const partners = await Partner.find({ is_active: true })
+      .sort({ sort_order: 1, createdAt: 1 })
+      .lean();
+    return ok(res, partners);
+  } catch (err) {
+    next(err);
+  }
+});
+
+// GET /admin/partners — all partners
+router.get("/admin/partners", requireAuth, async (req, res, next) => {
+  try {
+    const partners = await Partner.find({})
+      .sort({ sort_order: 1, createdAt: 1 })
+      .lean();
+    return ok(res, partners);
+  } catch (err) {
+    next(err);
+  }
+});
+
+// POST /admin/partners
+router.post(
+  "/admin/partners",
+  requireAuth,
+  upload.single("logo"),
+  async (req, res, next) => {
+    try {
+      const { name, website, sort_order, is_active } = req.body;
+      if (!name?.trim()) return fail(res, "Name is required");
+
+      const logo_url = req.file ? req.file.path : req.body.logo_url || "";
+
+      const partner = await Partner.create({
+        name: name.trim(),
+        logo_url,
+        website: website?.trim() || "",
+        sort_order: parseInt(sort_order) || 0,
+        is_active: is_active !== "false" && is_active !== false,
+      });
+
+      revalidate(["/"]);
+      return created(res, partner, "Partner created");
+    } catch (err) {
+      next(err);
+    }
+  },
+);
+
+// PUT /admin/partners/:id
+router.put(
+  "/admin/partners/:id",
+  requireAuth,
+  upload.single("logo"),
+  async (req, res, next) => {
+    try {
+      const { name, website, sort_order, is_active } = req.body;
+
+      const update = {};
+      if (name !== undefined) update.name = name.trim();
+      if (website !== undefined) update.website = website.trim();
+      if (sort_order !== undefined)
+        update.sort_order = parseInt(sort_order) || 0;
+      if (is_active !== undefined)
+        update.is_active = is_active !== "false" && is_active !== false;
+      if (req.file) update.logo_url = req.file.path;
+      else if (req.body.logo_url !== undefined)
+        update.logo_url = req.body.logo_url;
+
+      const partner = await Partner.findByIdAndUpdate(req.params.id, update, {
+        new: true,
+        runValidators: true,
+      }).lean();
+      if (!partner) return fail(res, "Partner not found", 404);
+
+      revalidate(["/"]);
+      return ok(res, partner, "Partner updated");
+    } catch (err) {
+      next(err);
+    }
+  },
+);
+
+// DELETE /admin/partners/:id
+router.delete("/admin/partners/:id", requireAuth, async (req, res, next) => {
+  try {
+    const partner = await Partner.findByIdAndDelete(req.params.id);
+    if (!partner) return fail(res, "Partner not found", 404);
+    revalidate(["/"]);
+    return ok(res, null, "Partner deleted");
+  } catch (err) {
+    next(err);
+  }
+});
 
 module.exports = router;

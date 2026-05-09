@@ -17,6 +17,17 @@ export default function Navbar({ settings }) {
   const phone = settings?.phone || SITE_CONFIG.phone;
   const whatsapp = settings?.whatsapp || SITE_CONFIG.whatsapp;
 
+  // Nav links from DB settings (admin-managed) or static fallback
+  const navLinks = (() => {
+    try {
+      const parsed = JSON.parse(settings?.nav_links || "");
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+    } catch {
+      /* use fallback */
+    }
+    return NAV_LINKS;
+  })();
+
   // ── Scroll detection ──────────────────────────────────────────
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -51,7 +62,7 @@ export default function Navbar({ settings }) {
 
           {/* ── Desktop Nav Links ── */}
           <ul className="hidden md:flex items-center gap-1">
-            {NAV_LINKS.map((link) => (
+            {navLinks.map((link) => (
               <li key={link.href}>
                 <Link
                   href={link.href}
@@ -145,7 +156,7 @@ export default function Navbar({ settings }) {
           }}
         >
           <div className="container-site py-4 flex flex-col gap-1">
-            {NAV_LINKS.map((link) => (
+            {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}

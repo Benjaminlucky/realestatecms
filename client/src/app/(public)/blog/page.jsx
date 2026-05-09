@@ -1,16 +1,46 @@
-import { blogApi, settingsApi } from "@/lib/api";
-import { SITE_CONFIG } from "@/config/site";
+import { blogApi, serverFetch } from "@/lib/api";
+import { SITE_CONFIG, SITE_URL } from "@/config/site";
 import BlogClient from "./BlogClient";
 
 export const revalidate = 300;
 
-export async function generateMetadata() {
+export async function generateMetadata({ searchParams }) {
+  const params = await searchParams;
+  // Noindex category filter pages that return no posts
+  const category = params?.category || "";
+  let isEmpty = false;
+  if (category) {
+    try {
+      const res = await blogApi.getAll({ category, perPage: 1 });
+      isEmpty = (res?.total || 0) === 0;
+    } catch {
+      /* keep indexable if API fails */
+    }
+  }
+
   try {
-    const data = await settingsApi.getPublic();
-    const s = data?.settings || {};
+    const data = await serverFetch("/settings", { next: { revalidate: 300 } });
+    const s = data?.data?.settings || {};
+    const siteName = s.site_name || SITE_CONFIG.name;
+    const desc = `Real estate insights, property investment tips, and market updates for Nigerian property buyers and investors.`;
+    const ogImage = `${SITE_URL}/api/og?title=${encodeURIComponent("Blog & Insights")}&subtitle=Real+Estate+News+%26+Investment+Tips&type=blog&site=${encodeURIComponent(siteName)}`;
     return {
-      title: `Blog & News — ${s.site_name || SITE_CONFIG.name}`,
-      description: `Real estate insights, property investment tips, and market updates for Nigerian property buyers and investors.`,
+      title: `Blog & News — ${siteName}`,
+      description: desc,
+      alternates: { canonical: `${SITE_URL}/blog` },
+      ...(isEmpty && { robots: { index: false, follow: true } }),
+      openGraph: {
+        title: `Blog & News — ${siteName}`,
+        description: desc,
+        url: `${SITE_URL}/blog`,
+        images: [{ url: ogImage, width: 1200, height: 630 }],
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: `Blog & News — ${siteName}`,
+        description: desc,
+        images: [ogImage],
+      },
     };
   } catch {
     return { title: `Blog — ${SITE_CONFIG.name}` };

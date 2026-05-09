@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -19,6 +19,8 @@ import {
   X,
   ExternalLink,
   Star,
+  Info,
+  LayoutTemplate,
 } from "lucide-react";
 import { useAuth } from "@/context/useAuth";
 import { toast } from "sonner";
@@ -30,6 +32,8 @@ const NAV = [
   { label: "Blog", href: "/admin/blog", icon: BookOpen },
   { label: "Enquiries", href: "/admin/enquiries", icon: MessageSquare },
   { label: "Reviews", href: "/admin/reviews", icon: Star },
+  { label: "About Page", href: "/admin/about", icon: Info },
+  { label: "Homepage", href: "/admin/homepage", icon: LayoutTemplate },
   { label: "Media", href: "/admin/media", icon: Image },
   { label: "Team", href: "/admin/settings/team", icon: Users },
   { label: "Settings", href: "/admin/settings", icon: Settings },
@@ -41,9 +45,22 @@ export default function AdminSidebar({ newEnquiries = 0 }) {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [siteName, setSiteName] = useState("");
 
   const isActive = (href) =>
     href === "/admin" ? pathname === "/admin" : pathname.startsWith(href);
+
+  // Fetch site name from DB so sidebar brand reflects admin settings
+  useEffect(() => {
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+    fetch(`${API_URL}/settings`)
+      .then((r) => r.json())
+      .then((json) => {
+        const name = json?.data?.settings?.site_name;
+        if (name) setSiteName(name);
+      })
+      .catch(() => {});
+  }, []);
 
   const handleLogoutConfirm = () => {
     setShowLogoutModal(false);
@@ -57,8 +74,9 @@ export default function AdminSidebar({ newEnquiries = 0 }) {
     <div
       style={{
         width: sidebarWidth,
-        minHeight: "100vh",
-        background: "linear-gradient(180deg, #060B14 0%, #0F172A 100%)",
+        minHeight: "100%",
+        background:
+          "linear-gradient(180deg, var(--color-secondary-dark, #060B14) 0%, var(--color-secondary, #0F172A) 100%)",
         borderRight: "1px solid rgba(255,255,255,0.06)",
         display: "flex",
         flexDirection: "column",
@@ -67,7 +85,7 @@ export default function AdminSidebar({ newEnquiries = 0 }) {
         flexShrink: 0,
       }}
     >
-      {/* Header */}
+      {/* ── Header ── */}
       <div
         style={{
           padding: collapsed ? "1.25rem 0" : "1.25rem 1.25rem",
@@ -87,7 +105,7 @@ export default function AdminSidebar({ newEnquiries = 0 }) {
                 width: "2rem",
                 height: "2rem",
                 borderRadius: "0.5rem",
-                background: "linear-gradient(135deg, #FF6B6B 0%, #E85555 100%)",
+                background: "var(--color-primary, #FF6B6B)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -106,7 +124,7 @@ export default function AdminSidebar({ newEnquiries = 0 }) {
                   lineHeight: 1,
                 }}
               >
-                NaijaRealty
+                {siteName || "Admin Panel"}
               </p>
               <p
                 style={{
@@ -128,7 +146,7 @@ export default function AdminSidebar({ newEnquiries = 0 }) {
               width: "2rem",
               height: "2rem",
               borderRadius: "0.5rem",
-              background: "linear-gradient(135deg, #FF6B6B 0%, #E85555 100%)",
+              background: "var(--color-primary, #FF6B6B)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -173,7 +191,7 @@ export default function AdminSidebar({ newEnquiries = 0 }) {
         </button>
       </div>
 
-      {/* Nav links */}
+      {/* ── Nav links ── */}
       <nav
         style={{
           flex: 1,
@@ -199,24 +217,25 @@ export default function AdminSidebar({ newEnquiries = 0 }) {
                 borderRadius: "0.625rem",
                 justifyContent: collapsed ? "center" : "flex-start",
                 textDecoration: "none",
+                // Active: solid primary bg with WHITE text — never a colour clash
                 background: active
-                  ? "linear-gradient(135deg, rgba(255,107,107,0.18) 0%, rgba(255,107,107,0.08) 100%)"
+                  ? "var(--color-primary, #FF6B6B)"
                   : "transparent",
-                border: `1px solid ${active ? "rgba(255,107,107,0.25)" : "transparent"}`,
-                color: active ? "#FF9B9B" : "rgba(255,255,255,0.5)",
+                border: `1px solid ${active ? "var(--color-primary, #FF6B6B)" : "transparent"}`,
+                color: active ? "white" : "rgba(255,255,255,0.55)",
                 transition: "all 150ms ease",
                 position: "relative",
               }}
               onMouseEnter={(e) => {
                 if (!active) {
-                  e.currentTarget.style.background = "rgba(255,255,255,0.05)";
-                  e.currentTarget.style.color = "rgba(255,255,255,0.85)";
+                  e.currentTarget.style.background = "rgba(255,255,255,0.07)";
+                  e.currentTarget.style.color = "white";
                 }
               }}
               onMouseLeave={(e) => {
                 if (!active) {
                   e.currentTarget.style.background = "transparent";
-                  e.currentTarget.style.color = "rgba(255,255,255,0.5)";
+                  e.currentTarget.style.color = "rgba(255,255,255,0.55)";
                 }
               }}
             >
@@ -233,7 +252,6 @@ export default function AdminSidebar({ newEnquiries = 0 }) {
                   {label}
                 </span>
               )}
-              {/* Enquiries badge */}
               {label === "Enquiries" && newEnquiries > 0 && (
                 <span
                   style={{
@@ -241,8 +259,11 @@ export default function AdminSidebar({ newEnquiries = 0 }) {
                     position: collapsed ? "absolute" : "static",
                     top: collapsed ? "6px" : "auto",
                     right: collapsed ? "6px" : "auto",
-                    background: "#FF6B6B",
-                    color: "white",
+                    // On active (primary bg): invert to white bg + primary text
+                    background: active
+                      ? "white"
+                      : "var(--color-primary, #FF6B6B)",
+                    color: active ? "var(--color-primary, #FF6B6B)" : "white",
                     fontSize: "0.6rem",
                     fontWeight: 700,
                     width: "1.1rem",
@@ -262,7 +283,7 @@ export default function AdminSidebar({ newEnquiries = 0 }) {
         })}
       </nav>
 
-      {/* Bottom: user + logout */}
+      {/* ── Bottom ── */}
       <div
         style={{
           padding: "0.75rem 0.625rem",
@@ -318,7 +339,7 @@ export default function AdminSidebar({ newEnquiries = 0 }) {
                 width: "2rem",
                 height: "2rem",
                 borderRadius: "50%",
-                background: "linear-gradient(135deg, #FF6B6B 0%, #F59E0B 100%)",
+                background: "var(--color-primary, #FF6B6B)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -410,10 +431,10 @@ export default function AdminSidebar({ newEnquiries = 0 }) {
 
   return (
     <>
-      {/* Desktop sidebar */}
+      {/* Desktop */}
       <div className="admin-sidebar-desktop">{sidebarContent}</div>
 
-      {/* Mobile: hamburger + drawer */}
+      {/* Mobile */}
       <div className="admin-sidebar-mobile">
         <button
           onClick={() => setMobileOpen(true)}
@@ -422,7 +443,7 @@ export default function AdminSidebar({ newEnquiries = 0 }) {
             top: "1rem",
             left: "1rem",
             zIndex: 50,
-            background: "#0F172A",
+            background: "var(--color-secondary, #0F172A)",
             border: "1px solid rgba(255,255,255,0.1)",
             borderRadius: "0.625rem",
             padding: "0.5rem",
@@ -478,7 +499,7 @@ export default function AdminSidebar({ newEnquiries = 0 }) {
         </div>
       </div>
 
-      {/* Logout confirmation modal */}
+      {/* Logout modal */}
       {showLogoutModal && (
         <div
           onClick={() => setShowLogoutModal(false)}
@@ -497,7 +518,7 @@ export default function AdminSidebar({ newEnquiries = 0 }) {
           <div
             onClick={(e) => e.stopPropagation()}
             style={{
-              background: "#0F172A",
+              background: "var(--color-secondary, #0F172A)",
               border: "1px solid rgba(255,255,255,0.1)",
               borderRadius: "1rem",
               padding: "1.5rem",
@@ -603,7 +624,8 @@ export default function AdminSidebar({ newEnquiries = 0 }) {
       )}
 
       <style>{`
-        .admin-sidebar-mobile { display: none; }
+        .admin-sidebar-desktop { display: flex; }
+        .admin-sidebar-mobile  { display: none; }
         @media (max-width: 768px) {
           .admin-sidebar-desktop { display: none; }
           .admin-sidebar-mobile  { display: block; }

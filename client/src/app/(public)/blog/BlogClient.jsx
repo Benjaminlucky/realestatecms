@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 
 import { useState, useCallback } from "react";
 import { useRouter, usePathname } from "next/navigation";
@@ -168,13 +169,12 @@ function BlogCard({ post, index }) {
         }}
       >
         {imageUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
+          <Image
             src={imageUrl}
             alt={post.title}
+            fill
+            sizes="(max-width:640px) 100vw, (max-width:1024px) 50vw, 33vw"
             style={{
-              width: "100%",
-              height: "100%",
               objectFit: "cover",
               transition: "transform 500ms ease",
             }}

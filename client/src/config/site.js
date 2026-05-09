@@ -193,6 +193,7 @@ export const NAV_LINKS = [
   { label: "Lands", href: "/lands" },
   { label: "Houses", href: "/houses" },
   { label: "Blog", href: "/blog" },
+  { label: "About", href: "/about" },
   { label: "Contact", href: "/contact" },
 ];
 

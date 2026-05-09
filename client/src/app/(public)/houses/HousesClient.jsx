@@ -624,7 +624,10 @@ export default function HousesClient({
                   }}
                 >
                   {houses.map((house) => (
-                    <HouseCard key={house.id} house={house} />
+                    <HouseCard
+                      key={house._id || house.id || house.slug}
+                      house={house}
+                    />
                   ))}
                 </div>
               )}

@@ -68,16 +68,27 @@ app.use(
 // confusion with the requireAuth middleware
 const generalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 300,
+  max: process.env.NODE_ENV === "production" ? 500 : 2000,
   standardHeaders: true,
   legacyHeaders: false,
+  // Skip rate limiting for localhost in development
+  skip: (req) =>
+    process.env.NODE_ENV !== "production" &&
+    (req.ip === "127.0.0.1" ||
+      req.ip === "::1" ||
+      req.ip === "::ffff:127.0.0.1"),
 });
 
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 20,
+  max: process.env.NODE_ENV === "production" ? 20 : 200,
   standardHeaders: true,
   legacyHeaders: false,
+  skip: (req) =>
+    process.env.NODE_ENV !== "production" &&
+    (req.ip === "127.0.0.1" ||
+      req.ip === "::1" ||
+      req.ip === "::ffff:127.0.0.1"),
   message: {
     success: false,
     message: "Too many login attempts. Try again in 15 minutes.",

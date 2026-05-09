@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import AdminShell from "@/components/admin/AdminShell";
 import { mediaApi } from "@/lib/api";
-import { API_URL } from "@/config/site";
 import { toast } from "sonner";
 import {
   Image as ImageIcon,
@@ -25,7 +24,7 @@ function MediaCard({ item, onDelete, onAltSave, selected, onSelect }) {
   const [editAlt, setEditAlt] = useState(false);
   const [altText, setAltText] = useState(item.alt_text || "");
   const [saving, setSaving] = useState(false);
-  const imgSrc = `${API_URL}/${item.file_path}`;
+  const imgSrc = item.file_path || "";
   const sizeKb = (item.file_size / 1024).toFixed(1);
 
   const saveAlt = async () => {

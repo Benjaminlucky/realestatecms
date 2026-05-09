@@ -11,8 +11,6 @@ import {
   Search,
   Edit2,
   Trash2,
-  ChevronLeft,
-  ChevronRight,
   X,
   AlertCircle,
   RefreshCw,
@@ -47,6 +45,7 @@ import {
   RotateCw,
   Strikethrough,
 } from "lucide-react";
+import Pagination from "@/components/admin/Pagination";
 
 // ── TipTap ────────────────────────────────────────────────────────
 import { useEditor, EditorContent } from "@tiptap/react";
@@ -139,7 +138,7 @@ function ImageUpload({ label, value, onChange, folder = "blog" }) {
             display: "block",
             fontSize: "0.8125rem",
             fontWeight: 600,
-            color: "#475569",
+            color: "var(--color-text-secondary, #475569)",
             marginBottom: "0.375rem",
           }}
         >
@@ -149,16 +148,16 @@ function ImageUpload({ label, value, onChange, folder = "blog" }) {
       <div
         style={{
           border: "1px dashed #CBD5E1",
-          borderRadius: "0.75rem",
+          borderRadius: "var(--radius, 0.75rem)",
           padding: "1rem",
-          background: "#F8FAFC",
+          background: "var(--color-surface-2, #F8FAFC)",
           cursor: "pointer",
           position: "relative",
         }}
         onClick={() => ref.current?.click()}
         onDragOver={(e) => {
           e.preventDefault();
-          e.currentTarget.style.borderColor = "#FF6B6B";
+          e.currentTarget.style.borderColor = "var(--color-primary, #FF6B6B)";
         }}
         onDragLeave={(e) => {
           e.currentTarget.style.borderColor = "#CBD5E1";
@@ -212,7 +211,7 @@ function ImageUpload({ label, value, onChange, folder = "blog" }) {
               <Loader2
                 size={24}
                 style={{
-                  color: "#FF6B6B",
+                  color: "var(--color-primary, #FF6B6B)",
                   animation: "spin 1s linear infinite",
                   margin: "0 auto",
                 }}
@@ -220,10 +219,19 @@ function ImageUpload({ label, value, onChange, folder = "blog" }) {
             ) : (
               <Upload
                 size={24}
-                style={{ color: "#94A3B8", margin: "0 auto 0.5rem" }}
+                style={{
+                  color: "var(--color-text-muted, #94A3B8)",
+                  margin: "0 auto 0.5rem",
+                }}
               />
             )}
-            <p style={{ fontSize: "0.8125rem", color: "#64748B", margin: 0 }}>
+            <p
+              style={{
+                fontSize: "0.8125rem",
+                color: "var(--color-text-secondary, #64748B)",
+                margin: 0,
+              }}
+            >
               {uploading ? "Uploading…" : "Click or drag to upload"}
             </p>
           </div>
@@ -273,13 +281,11 @@ function TipTapToolbar({ editor, onImageUpload }) {
       {icon}
     </ToolbarBtn>
   );
-
   const addLink = () => {
     const url = window.prompt("Enter URL:");
     if (url)
       editor.chain().focus().setLink({ href: url, target: "_blank" }).run();
   };
-
   return (
     <div
       style={{
@@ -288,11 +294,10 @@ function TipTapToolbar({ editor, onImageUpload }) {
         gap: "0.125rem",
         padding: "0.5rem",
         borderBottom: "1px solid #E2E8F0",
-        background: "#F8FAFC",
+        background: "var(--color-surface-2, #F8FAFC)",
         borderRadius: "0.75rem 0.75rem 0 0",
       }}
     >
-      {/* History */}
       <ToolbarBtn
         onClick={() => editor.chain().focus().undo().run()}
         disabled={!editor.can().undo()}
@@ -310,8 +315,6 @@ function TipTapToolbar({ editor, onImageUpload }) {
       <div
         style={{ width: "1px", background: "#E2E8F0", margin: "0 0.25rem" }}
       />
-
-      {/* Headings */}
       {btn(
         () => editor.chain().focus().toggleHeading({ level: 2 }).run(),
         "Heading 2",
@@ -327,8 +330,6 @@ function TipTapToolbar({ editor, onImageUpload }) {
       <div
         style={{ width: "1px", background: "#E2E8F0", margin: "0 0.25rem" }}
       />
-
-      {/* Formatting */}
       {btn(
         () => editor.chain().focus().toggleBold().run(),
         "Bold",
@@ -368,8 +369,6 @@ function TipTapToolbar({ editor, onImageUpload }) {
       <div
         style={{ width: "1px", background: "#E2E8F0", margin: "0 0.25rem" }}
       />
-
-      {/* Alignment */}
       {btn(
         () => editor.chain().focus().setTextAlign("left").run(),
         "Align Left",
@@ -391,8 +390,6 @@ function TipTapToolbar({ editor, onImageUpload }) {
       <div
         style={{ width: "1px", background: "#E2E8F0", margin: "0 0.25rem" }}
       />
-
-      {/* Lists */}
       {btn(
         () => editor.chain().focus().toggleBulletList().run(),
         "Bullet List",
@@ -420,8 +417,6 @@ function TipTapToolbar({ editor, onImageUpload }) {
       <div
         style={{ width: "1px", background: "#E2E8F0", margin: "0 0.25rem" }}
       />
-
-      {/* Link + Image */}
       {btn(addLink, "Add Link", editor.isActive("link"), <Link2 size={14} />)}
       <ToolbarBtn onClick={onImageUpload} title="Upload Image">
         <ImageIcon size={14} />
@@ -433,7 +428,6 @@ function TipTapToolbar({ editor, onImageUpload }) {
 // ── TipTap Editor ─────────────────────────────────────────────────
 function RichEditor({ value, onChange }) {
   const imgRef = useRef(null);
-
   const editor = useEditor({
     immediatelyRender: false,
     extensions: [
@@ -456,7 +450,6 @@ function RichEditor({ value, onChange }) {
     },
   });
 
-  // Sync external value changes (e.g. when editing opens)
   useEffect(() => {
     if (editor && value !== undefined && editor.getHTML() !== value) {
       editor.commands.setContent(value || "", false);
@@ -469,10 +462,12 @@ function RichEditor({ value, onChange }) {
     try {
       const res = await mediaApi.upload(file, "blog");
       const url = res?.data?.file_path;
-      if (url) {
-        const fullUrl = getImgUrl(url);
-        editor.chain().focus().setImage({ src: fullUrl }).run();
-      }
+      if (url)
+        editor
+          .chain()
+          .focus()
+          .setImage({ src: getImgUrl(url) })
+          .run();
     } catch {
       toast.error("Image upload failed");
     }
@@ -484,10 +479,10 @@ function RichEditor({ value, onChange }) {
   return (
     <div
       style={{
-        border: "1px solid #E2E8F0",
-        borderRadius: "0.75rem",
+        border: "1px solid var(--color-border, #E2E8F0)",
+        borderRadius: "var(--radius, 0.75rem)",
         overflow: "hidden",
-        background: "white",
+        background: "var(--color-surface, white)",
       }}
     >
       <TipTapToolbar
@@ -499,15 +494,25 @@ function RichEditor({ value, onChange }) {
         style={{
           padding: "0.5rem 1rem",
           borderTop: "1px solid #E2E8F0",
-          background: "#F8FAFC",
+          background: "var(--color-surface-2, #F8FAFC)",
           display: "flex",
           gap: "1.5rem",
         }}
       >
-        <span style={{ fontSize: "0.75rem", color: "#94A3B8" }}>
+        <span
+          style={{
+            fontSize: "0.75rem",
+            color: "var(--color-text-muted, #94A3B8)",
+          }}
+        >
           {words} words
         </span>
-        <span style={{ fontSize: "0.75rem", color: "#94A3B8" }}>
+        <span
+          style={{
+            fontSize: "0.75rem",
+            color: "var(--color-text-muted, #94A3B8)",
+          }}
+        >
           {readTime} min read
         </span>
       </div>
@@ -555,8 +560,8 @@ function DeleteModal({ item, onConfirm, onCancel, loading }) {
     >
       <div
         style={{
-          background: "white",
-          borderRadius: "1rem",
+          background: "var(--color-surface, white)",
+          borderRadius: "var(--radius-lg, 1rem)",
           padding: "2rem",
           maxWidth: "420px",
           width: "100%",
@@ -582,7 +587,7 @@ function DeleteModal({ item, onConfirm, onCancel, loading }) {
             fontFamily: "var(--font-heading)",
             fontWeight: 700,
             fontSize: "1.125rem",
-            color: "#0F172A",
+            color: "var(--color-text, #0F172A)",
             textAlign: "center",
             marginBottom: "0.5rem",
           }}
@@ -591,13 +596,14 @@ function DeleteModal({ item, onConfirm, onCancel, loading }) {
         </h3>
         <p
           style={{
-            color: "#64748B",
+            color: "var(--color-text-secondary, #64748B)",
             fontSize: "0.875rem",
             textAlign: "center",
             marginBottom: "1.5rem",
           }}
         >
-          "<strong>{item?.title}</strong>" will be permanently deleted.
+          &ldquo;<strong>{item?.title}</strong>&rdquo; will be permanently
+          deleted.
         </p>
         <div style={{ display: "flex", gap: "0.75rem" }}>
           <button
@@ -606,14 +612,14 @@ function DeleteModal({ item, onConfirm, onCancel, loading }) {
             style={{
               flex: 1,
               padding: "0.75rem",
-              borderRadius: "0.625rem",
-              border: "1px solid #E2E8F0",
-              background: "white",
+              borderRadius: "var(--radius, 0.625rem)",
+              border: "1px solid var(--color-border, #E2E8F0)",
+              background: "var(--color-surface, white)",
               fontFamily: "var(--font-heading)",
               fontWeight: 600,
               fontSize: "0.875rem",
               cursor: "pointer",
-              color: "#475569",
+              color: "var(--color-text-secondary, #475569)",
             }}
           >
             Cancel
@@ -625,7 +631,7 @@ function DeleteModal({ item, onConfirm, onCancel, loading }) {
             style={{
               flex: 1,
               padding: "0.75rem",
-              borderRadius: "0.625rem",
+              borderRadius: "var(--radius, 0.625rem)",
               border: "none",
               background: "#EF4444",
               color: "white",
@@ -660,13 +666,10 @@ function CategoriesModal({ categories, onClose, onRefresh }) {
   const [name, setName] = useState("");
   const [saving, setSaving] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
-
-  // Rename state
   const [editingId, setEditingId] = useState(null);
   const [editingName, setEditingName] = useState("");
   const [renamingId, setRenamingId] = useState(null);
 
-  // ── Create ────────────────────────────────────────────────────
   const handleCreate = async () => {
     if (!name.trim()) return;
     setSaving(true);
@@ -682,12 +685,10 @@ function CategoriesModal({ categories, onClose, onRefresh }) {
     }
   };
 
-  // ── Rename ────────────────────────────────────────────────────
   const startEdit = (cat) => {
     setEditingId(cat._id || cat.id);
     setEditingName(cat.name);
   };
-
   const cancelEdit = () => {
     setEditingId(null);
     setEditingName("");
@@ -712,7 +713,6 @@ function CategoriesModal({ categories, onClose, onRefresh }) {
     }
   };
 
-  // ── Delete ────────────────────────────────────────────────────
   const handleDelete = async (id, catName) => {
     if (!confirm(`Delete "${catName}"? Posts will be uncategorized.`)) return;
     setDeletingId(id);
@@ -742,14 +742,13 @@ function CategoriesModal({ categories, onClose, onRefresh }) {
     >
       <div
         style={{
-          background: "white",
-          borderRadius: "1rem",
+          background: "var(--color-surface, white)",
+          borderRadius: "var(--radius-lg, 1rem)",
           width: "100%",
           maxWidth: "500px",
           boxShadow: "0 20px 60px rgba(0,0,0,0.2)",
         }}
       >
-        {/* Header */}
         <div
           style={{
             padding: "1.25rem 1.5rem",
@@ -760,13 +759,13 @@ function CategoriesModal({ categories, onClose, onRefresh }) {
           }}
         >
           <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-            <Tag size={18} style={{ color: "#FF6B6B" }} />
+            <Tag size={18} style={{ color: "var(--color-primary, #FF6B6B)" }} />
             <h2
               style={{
                 fontFamily: "var(--font-heading)",
                 fontWeight: 700,
                 fontSize: "1.0625rem",
-                color: "#0F172A",
+                color: "var(--color-text, #0F172A)",
                 margin: 0,
               }}
             >
@@ -776,8 +775,8 @@ function CategoriesModal({ categories, onClose, onRefresh }) {
               style={{
                 fontSize: "0.75rem",
                 fontWeight: 600,
-                color: "#94A3B8",
-                background: "#F1F5F9",
+                color: "var(--color-text-muted, #94A3B8)",
+                background: "var(--color-surface-3, #F1F5F9)",
                 padding: "0.1rem 0.5rem",
                 borderRadius: "9999px",
               }}
@@ -792,23 +791,21 @@ function CategoriesModal({ categories, onClose, onRefresh }) {
               background: "none",
               border: "none",
               cursor: "pointer",
-              color: "#64748B",
+              color: "var(--color-text-secondary, #64748B)",
               padding: "0.25rem",
             }}
           >
             <X size={18} />
           </button>
         </div>
-
         <div style={{ padding: "1.25rem 1.5rem" }}>
-          {/* Create new */}
           <div style={{ marginBottom: "1.25rem" }}>
             <label
               style={{
                 display: "block",
                 fontSize: "0.75rem",
                 fontWeight: 700,
-                color: "#64748B",
+                color: "var(--color-text-secondary, #64748B)",
                 textTransform: "uppercase",
                 letterSpacing: "0.08em",
                 marginBottom: "0.5rem",
@@ -825,11 +822,11 @@ function CategoriesModal({ categories, onClose, onRefresh }) {
                 style={{
                   flex: 1,
                   padding: "0.625rem 0.875rem",
-                  borderRadius: "0.625rem",
-                  border: "1px solid #E2E8F0",
+                  borderRadius: "var(--radius, 0.625rem)",
+                  border: "1px solid var(--color-border, #E2E8F0)",
                   fontSize: "0.875rem",
                   outline: "none",
-                  color: "#0F172A",
+                  color: "var(--color-text, #0F172A)",
                 }}
               />
               <button
@@ -838,7 +835,7 @@ function CategoriesModal({ categories, onClose, onRefresh }) {
                 disabled={saving || !name.trim()}
                 style={{
                   padding: "0.625rem 1.125rem",
-                  borderRadius: "0.625rem",
+                  borderRadius: "var(--radius, 0.625rem)",
                   border: "none",
                   background: saving || !name.trim() ? "#E2E8F0" : "#FF6B6B",
                   color: saving || !name.trim() ? "#94A3B8" : "white",
@@ -859,18 +856,14 @@ function CategoriesModal({ categories, onClose, onRefresh }) {
                   />
                 ) : (
                   <FolderPlus size={14} />
-                )}
+                )}{" "}
                 Add
               </button>
             </div>
           </div>
-
-          {/* Divider */}
           <div
             style={{ borderTop: "1px solid #F1F5F9", marginBottom: "1rem" }}
           />
-
-          {/* Category list */}
           <div
             style={{
               display: "flex",
@@ -887,19 +880,21 @@ function CategoriesModal({ categories, onClose, onRefresh }) {
                   style={{ color: "#E2E8F0", margin: "0 auto 0.75rem" }}
                 />
                 <p
-                  style={{ color: "#94A3B8", fontSize: "0.875rem", margin: 0 }}
+                  style={{
+                    color: "var(--color-text-muted, #94A3B8)",
+                    fontSize: "0.875rem",
+                    margin: 0,
+                  }}
                 >
                   No categories yet — create one above
                 </p>
               </div>
             )}
-
             {categories.map((cat) => {
               const id = cat._id || cat.id;
               const isEditing = editingId === id;
               const isRenaming = renamingId === id;
               const isDeleting = deletingId === id;
-
               return (
                 <div
                   key={id}
@@ -908,7 +903,7 @@ function CategoriesModal({ categories, onClose, onRefresh }) {
                     alignItems: "center",
                     gap: "0.625rem",
                     padding: "0.625rem 0.875rem",
-                    borderRadius: "0.625rem",
+                    borderRadius: "var(--radius, 0.625rem)",
                     border: `1px solid ${isEditing ? "#FF6B6B" : "#E2E8F0"}`,
                     background: isEditing
                       ? "rgba(255,107,107,0.03)"
@@ -917,7 +912,6 @@ function CategoriesModal({ categories, onClose, onRefresh }) {
                   }}
                 >
                   {isEditing ? (
-                    /* ── Inline edit mode ── */
                     <>
                       <input
                         autoFocus
@@ -934,11 +928,10 @@ function CategoriesModal({ categories, onClose, onRefresh }) {
                           border: "1px solid #FF6B6B",
                           fontSize: "0.875rem",
                           outline: "none",
-                          color: "#0F172A",
-                          background: "white",
+                          color: "var(--color-text, #0F172A)",
+                          background: "var(--color-surface, white)",
                         }}
                       />
-                      {/* Confirm rename */}
                       <button
                         type="button"
                         onClick={() => handleRename(cat)}
@@ -964,7 +957,6 @@ function CategoriesModal({ categories, onClose, onRefresh }) {
                           <Check size={13} />
                         )}
                       </button>
-                      {/* Cancel rename */}
                       <button
                         type="button"
                         onClick={cancelEdit}
@@ -972,9 +964,9 @@ function CategoriesModal({ categories, onClose, onRefresh }) {
                         style={{
                           padding: "0.375rem",
                           borderRadius: "0.375rem",
-                          border: "1px solid #E2E8F0",
-                          background: "white",
-                          color: "#64748B",
+                          border: "1px solid var(--color-border, #E2E8F0)",
+                          background: "var(--color-surface, white)",
+                          color: "var(--color-text-secondary, #64748B)",
                           cursor: "pointer",
                           display: "flex",
                           flexShrink: 0,
@@ -984,14 +976,13 @@ function CategoriesModal({ categories, onClose, onRefresh }) {
                       </button>
                     </>
                   ) : (
-                    /* ── Display mode ── */
                     <>
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <p
                           style={{
                             fontWeight: 600,
                             fontSize: "0.875rem",
-                            color: "#0F172A",
+                            color: "var(--color-text, #0F172A)",
                             margin: 0,
                             overflow: "hidden",
                             textOverflow: "ellipsis",
@@ -1003,15 +994,13 @@ function CategoriesModal({ categories, onClose, onRefresh }) {
                         <p
                           style={{
                             fontSize: "0.7rem",
-                            color: "#94A3B8",
+                            color: "var(--color-text-muted, #94A3B8)",
                             margin: 0,
                           }}
                         >
                           /{cat.slug}
                         </p>
                       </div>
-
-                      {/* Rename button */}
                       <button
                         type="button"
                         onClick={() => startEdit(cat)}
@@ -1019,9 +1008,9 @@ function CategoriesModal({ categories, onClose, onRefresh }) {
                         style={{
                           padding: "0.375rem",
                           borderRadius: "0.375rem",
-                          border: "1px solid #E2E8F0",
-                          background: "white",
-                          color: "#64748B",
+                          border: "1px solid var(--color-border, #E2E8F0)",
+                          background: "var(--color-surface, white)",
+                          color: "var(--color-text-secondary, #64748B)",
                           cursor: "pointer",
                           display: "flex",
                           flexShrink: 0,
@@ -1032,14 +1021,13 @@ function CategoriesModal({ categories, onClose, onRefresh }) {
                           e.currentTarget.style.color = "#0F172A";
                         }}
                         onMouseLeave={(e) => {
-                          e.currentTarget.style.borderColor = "#E2E8F0";
+                          e.currentTarget.style.borderColor =
+                            "var(--color-border, #E2E8F0)";
                           e.currentTarget.style.color = "#64748B";
                         }}
                       >
                         <Edit2 size={13} />
                       </button>
-
-                      {/* Delete button */}
                       <button
                         type="button"
                         onClick={() => handleDelete(id, cat.name)}
@@ -1072,8 +1060,6 @@ function CategoriesModal({ categories, onClose, onRefresh }) {
             })}
           </div>
         </div>
-
-        {/* Footer */}
         <div
           style={{
             padding: "1rem 1.5rem",
@@ -1087,14 +1073,14 @@ function CategoriesModal({ categories, onClose, onRefresh }) {
             onClick={onClose}
             style={{
               padding: "0.5rem 1.25rem",
-              borderRadius: "0.625rem",
-              border: "1px solid #E2E8F0",
-              background: "white",
+              borderRadius: "var(--radius, 0.625rem)",
+              border: "1px solid var(--color-border, #E2E8F0)",
+              background: "var(--color-surface, white)",
               fontFamily: "var(--font-heading)",
               fontWeight: 600,
               fontSize: "0.875rem",
               cursor: "pointer",
-              color: "#475569",
+              color: "var(--color-text-secondary, #475569)",
             }}
           >
             Done
@@ -1138,22 +1124,16 @@ function PostForm({ post, categories, onSave, onCancel }) {
   });
   const [saving, setSaving] = useState(false);
   const [slugEdited, setSlugEdited] = useState(isEdit);
-  const [tab, setTab] = useState("content"); // content | seo
-
+  const [tab, setTab] = useState("content");
   const set = (k, v) => setForm((p) => ({ ...p, [k]: v }));
-
-  // Auto-generate slug from title
   const handleTitle = (v) => {
     set("title", v);
     if (!slugEdited) set("slug", slugify(v));
   };
-
-  // Auto-calculate reading time when content changes
   const handleContent = (html) => {
     set("content", html);
     set("reading_time", calcReadingTime(html));
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!form.title) {
@@ -1179,19 +1159,19 @@ function PostForm({ post, categories, onSave, onCancel }) {
   const inputStyle = {
     width: "100%",
     padding: "0.625rem 0.875rem",
-    borderRadius: "0.625rem",
-    border: "1px solid #E2E8F0",
+    borderRadius: "var(--radius, 0.625rem)",
+    border: "1px solid var(--color-border, #E2E8F0)",
     fontSize: "0.875rem",
-    color: "#0F172A",
+    color: "var(--color-text, #0F172A)",
     outline: "none",
-    background: "white",
+    background: "var(--color-surface, white)",
     boxSizing: "border-box",
   };
   const labelStyle = {
     display: "block",
     fontSize: "0.8125rem",
     fontWeight: 600,
-    color: "#475569",
+    color: "var(--color-text-secondary, #475569)",
     marginBottom: "0.375rem",
   };
 
@@ -1208,14 +1188,13 @@ function PostForm({ post, categories, onSave, onCancel }) {
     >
       <div
         style={{
-          background: "white",
+          background: "var(--color-surface, white)",
           borderRadius: "1.25rem",
           maxWidth: "900px",
           margin: "0 auto",
           boxShadow: "0 24px 64px rgba(0,0,0,0.2)",
         }}
       >
-        {/* Header */}
         <div
           style={{
             padding: "1.5rem 2rem",
@@ -1225,7 +1204,7 @@ function PostForm({ post, categories, onSave, onCancel }) {
             justifyContent: "space-between",
             position: "sticky",
             top: 0,
-            background: "white",
+            background: "var(--color-surface, white)",
             borderRadius: "1.25rem 1.25rem 0 0",
             zIndex: 10,
           }}
@@ -1233,13 +1212,16 @@ function PostForm({ post, categories, onSave, onCancel }) {
           <div
             style={{ display: "flex", alignItems: "center", gap: "0.625rem" }}
           >
-            <FileText size={18} style={{ color: "#FF6B6B" }} />
+            <FileText
+              size={18}
+              style={{ color: "var(--color-primary, #FF6B6B)" }}
+            />
             <h2
               style={{
                 fontFamily: "var(--font-heading)",
                 fontWeight: 800,
                 fontSize: "1.125rem",
-                color: "#0F172A",
+                color: "var(--color-text, #0F172A)",
                 margin: 0,
               }}
             >
@@ -1249,13 +1231,12 @@ function PostForm({ post, categories, onSave, onCancel }) {
           <div
             style={{ display: "flex", gap: "0.75rem", alignItems: "center" }}
           >
-            {/* Status toggle */}
             <div
               style={{
                 display: "flex",
                 gap: "0.375rem",
-                background: "#F1F5F9",
-                borderRadius: "0.625rem",
+                background: "var(--color-surface-3, #F1F5F9)",
+                borderRadius: "var(--radius, 0.625rem)",
                 padding: "0.25rem",
               }}
             >
@@ -1315,16 +1296,14 @@ function PostForm({ post, categories, onSave, onCancel }) {
                 background: "none",
                 border: "none",
                 cursor: "pointer",
-                color: "#64748B",
+                color: "var(--color-text-secondary, #64748B)",
               }}
             >
               <X size={18} />
             </button>
           </div>
         </div>
-
         <form onSubmit={handleSubmit}>
-          {/* Tab switcher */}
           <div
             style={{
               display: "flex",
@@ -1362,7 +1341,6 @@ function PostForm({ post, categories, onSave, onCancel }) {
               </button>
             ))}
           </div>
-
           <div style={{ padding: "2rem" }}>
             {tab === "content" && (
               <div
@@ -1372,7 +1350,6 @@ function PostForm({ post, categories, onSave, onCancel }) {
                   gap: "2rem",
                 }}
               >
-                {/* Main content */}
                 <div
                   style={{
                     display: "flex",
@@ -1402,7 +1379,7 @@ function PostForm({ post, categories, onSave, onCancel }) {
                           left: "0.875rem",
                           top: "50%",
                           transform: "translateY(-50%)",
-                          color: "#94A3B8",
+                          color: "var(--color-text-muted, #94A3B8)",
                           fontSize: "0.8125rem",
                         }}
                       >
@@ -1434,8 +1411,6 @@ function PostForm({ post, categories, onSave, onCancel }) {
                     <RichEditor value={form.content} onChange={handleContent} />
                   </div>
                 </div>
-
-                {/* Sidebar */}
                 <div
                   style={{
                     display: "flex",
@@ -1483,7 +1458,12 @@ function PostForm({ post, categories, onSave, onCancel }) {
                         }
                         style={{ ...inputStyle, width: "80px" }}
                       />
-                      <span style={{ fontSize: "0.8125rem", color: "#94A3B8" }}>
+                      <span
+                        style={{
+                          fontSize: "0.8125rem",
+                          color: "var(--color-text-muted, #94A3B8)",
+                        }}
+                      >
                         min read
                       </span>
                     </div>
@@ -1491,7 +1471,6 @@ function PostForm({ post, categories, onSave, onCancel }) {
                 </div>
               </div>
             )}
-
             {tab === "seo" && (
               <div
                 style={{
@@ -1504,16 +1483,16 @@ function PostForm({ post, categories, onSave, onCancel }) {
                 <div
                   style={{
                     padding: "1rem",
-                    borderRadius: "0.75rem",
-                    background: "#F8FAFC",
-                    border: "1px solid #E2E8F0",
+                    borderRadius: "var(--radius, 0.75rem)",
+                    background: "var(--color-surface-2, #F8FAFC)",
+                    border: "1px solid var(--color-border, #E2E8F0)",
                   }}
                 >
                   <p
                     style={{
                       fontSize: "0.75rem",
                       fontWeight: 600,
-                      color: "#94A3B8",
+                      color: "var(--color-text-muted, #94A3B8)",
                       textTransform: "uppercase",
                       letterSpacing: "0.08em",
                       marginBottom: "0.75rem",
@@ -1556,7 +1535,12 @@ function PostForm({ post, categories, onSave, onCancel }) {
                 <div>
                   <label style={labelStyle}>
                     Meta Title{" "}
-                    <span style={{ color: "#94A3B8", fontWeight: 400 }}>
+                    <span
+                      style={{
+                        color: "var(--color-text-muted, #94A3B8)",
+                        fontWeight: 400,
+                      }}
+                    >
                       ({(form.meta_title || "").length}/60)
                     </span>
                   </label>
@@ -1571,7 +1555,12 @@ function PostForm({ post, categories, onSave, onCancel }) {
                 <div>
                   <label style={labelStyle}>
                     Meta Description{" "}
-                    <span style={{ color: "#94A3B8", fontWeight: 400 }}>
+                    <span
+                      style={{
+                        color: "var(--color-text-muted, #94A3B8)",
+                        fontWeight: 400,
+                      }}
+                    >
                       ({(form.meta_description || "").length}/160)
                     </span>
                   </label>
@@ -1587,8 +1576,6 @@ function PostForm({ post, categories, onSave, onCancel }) {
               </div>
             )}
           </div>
-
-          {/* Footer */}
           <div
             style={{
               padding: "1.25rem 2rem",
@@ -1596,14 +1583,14 @@ function PostForm({ post, categories, onSave, onCancel }) {
               display: "flex",
               alignItems: "center",
               justifyContent: "space-between",
-              background: "#F8FAFC",
+              background: "var(--color-surface-2, #F8FAFC)",
               borderRadius: "0 0 1.25rem 1.25rem",
             }}
           >
             <div
               style={{
                 fontSize: "0.8125rem",
-                color: "#94A3B8",
+                color: "var(--color-text-muted, #94A3B8)",
                 display: "flex",
                 alignItems: "center",
                 gap: "0.5rem",
@@ -1617,14 +1604,14 @@ function PostForm({ post, categories, onSave, onCancel }) {
                 onClick={onCancel}
                 style={{
                   padding: "0.625rem 1.25rem",
-                  borderRadius: "0.625rem",
-                  border: "1px solid #E2E8F0",
-                  background: "white",
+                  borderRadius: "var(--radius, 0.625rem)",
+                  border: "1px solid var(--color-border, #E2E8F0)",
+                  background: "var(--color-surface, white)",
                   fontFamily: "var(--font-heading)",
                   fontWeight: 600,
                   fontSize: "0.875rem",
                   cursor: "pointer",
-                  color: "#475569",
+                  color: "var(--color-text-secondary, #475569)",
                 }}
               >
                 Cancel
@@ -1634,7 +1621,7 @@ function PostForm({ post, categories, onSave, onCancel }) {
                 disabled={saving}
                 style={{
                   padding: "0.625rem 1.5rem",
-                  borderRadius: "0.625rem",
+                  borderRadius: "var(--radius, 0.625rem)",
                   border: "none",
                   background: saving
                     ? "rgba(255,107,107,0.5)"
@@ -1677,22 +1664,21 @@ export default function AdminBlogPage() {
   const [loading, setLoading] = useState(true);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
+  const [perPage, setPerPage] = useState(12); // ← replaces const PER_PAGE = 12
   const [q, setQ] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
 
-  const [editing, setEditing] = useState(null); // post object or {}
+  const [editing, setEditing] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [deleting, setDeleting] = useState(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [showCats, setShowCats] = useState(false);
 
-  const PER_PAGE = 12;
-
   const loadPosts = useCallback(
     async (p = page) => {
       setLoading(true);
       try {
-        const params = { page: p, perPage: PER_PAGE };
+        const params = { page: p, perPage }; // ← uses perPage state
         if (q) params.q = q;
         if (statusFilter) params.status = statusFilter;
         const res = await blogApi.adminGetAll(params);
@@ -1705,7 +1691,7 @@ export default function AdminBlogPage() {
         setLoading(false);
       }
     },
-    [page, q, statusFilter],
+    [page, perPage, q, statusFilter], // ← perPage in deps
   );
 
   const loadCategories = async () => {
@@ -1721,6 +1707,12 @@ export default function AdminBlogPage() {
   useEffect(() => {
     loadCategories();
   }, []);
+
+  // ── perPage change — reset to page 1 ─────────────────────────
+  const handlePerPage = (n) => {
+    setPerPage(n);
+    loadPosts(1);
+  };
 
   const openCreate = () => {
     setEditing({});
@@ -1758,7 +1750,7 @@ export default function AdminBlogPage() {
     }
   };
 
-  const totalPages = Math.ceil(total / PER_PAGE);
+  const totalPages = Math.ceil(total / perPage); // ← uses perPage state
 
   return (
     <AdminShell>
@@ -1783,20 +1775,29 @@ export default function AdminBlogPage() {
                 marginBottom: "0.25rem",
               }}
             >
-              <BookOpen size={20} style={{ color: "#FF6B6B" }} />
+              <BookOpen
+                size={20}
+                style={{ color: "var(--color-primary, #FF6B6B)" }}
+              />
               <h1
                 style={{
                   fontFamily: "var(--font-heading)",
                   fontWeight: 800,
                   fontSize: "1.5rem",
-                  color: "#0F172A",
+                  color: "var(--color-text, #0F172A)",
                   margin: 0,
                 }}
               >
                 Blog Posts
               </h1>
             </div>
-            <p style={{ color: "#94A3B8", fontSize: "0.875rem", margin: 0 }}>
+            <p
+              style={{
+                color: "var(--color-text-muted, #94A3B8)",
+                fontSize: "0.875rem",
+                margin: 0,
+              }}
+            >
               {total} post{total !== 1 ? "s" : ""} total
             </p>
           </div>
@@ -1808,10 +1809,10 @@ export default function AdminBlogPage() {
                 alignItems: "center",
                 gap: "0.5rem",
                 padding: "0.625rem 1rem",
-                borderRadius: "0.625rem",
-                border: "1px solid #E2E8F0",
-                background: "white",
-                color: "#475569",
+                borderRadius: "var(--radius, 0.625rem)",
+                border: "1px solid var(--color-border, #E2E8F0)",
+                background: "var(--color-surface, white)",
+                color: "var(--color-text-secondary, #475569)",
                 fontFamily: "var(--font-heading)",
                 fontWeight: 600,
                 fontSize: "0.8125rem",
@@ -1824,11 +1825,11 @@ export default function AdminBlogPage() {
               onClick={() => loadPosts(page)}
               style={{
                 padding: "0.625rem",
-                borderRadius: "0.625rem",
-                border: "1px solid #E2E8F0",
-                background: "white",
+                borderRadius: "var(--radius, 0.625rem)",
+                border: "1px solid var(--color-border, #E2E8F0)",
+                background: "var(--color-surface, white)",
                 cursor: "pointer",
-                color: "#475569",
+                color: "var(--color-text-secondary, #475569)",
               }}
             >
               <RefreshCw size={15} style={{ display: "block" }} />
@@ -1840,7 +1841,7 @@ export default function AdminBlogPage() {
                 alignItems: "center",
                 gap: "0.5rem",
                 padding: "0.625rem 1.25rem",
-                borderRadius: "0.625rem",
+                borderRadius: "var(--radius, 0.625rem)",
                 border: "none",
                 background: "linear-gradient(135deg, #FF6B6B 0%, #E85555 100%)",
                 color: "white",
@@ -1873,7 +1874,7 @@ export default function AdminBlogPage() {
                 left: "0.75rem",
                 top: "50%",
                 transform: "translateY(-50%)",
-                color: "#94A3B8",
+                color: "var(--color-text-muted, #94A3B8)",
               }}
             />
             <input
@@ -1886,11 +1887,11 @@ export default function AdminBlogPage() {
                 paddingRight: "0.875rem",
                 paddingTop: "0.625rem",
                 paddingBottom: "0.625rem",
-                borderRadius: "0.625rem",
-                border: "1px solid #E2E8F0",
+                borderRadius: "var(--radius, 0.625rem)",
+                border: "1px solid var(--color-border, #E2E8F0)",
                 fontSize: "0.875rem",
                 outline: "none",
-                color: "#0F172A",
+                color: "var(--color-text, #0F172A)",
                 boxSizing: "border-box",
               }}
             />
@@ -1900,11 +1901,11 @@ export default function AdminBlogPage() {
             onChange={(e) => setStatusFilter(e.target.value)}
             style={{
               padding: "0.625rem 0.875rem",
-              borderRadius: "0.625rem",
-              border: "1px solid #E2E8F0",
+              borderRadius: "var(--radius, 0.625rem)",
+              border: "1px solid var(--color-border, #E2E8F0)",
               fontSize: "0.875rem",
-              color: "#475569",
-              background: "white",
+              color: "var(--color-text-secondary, #475569)",
+              background: "var(--color-surface, white)",
               cursor: "pointer",
               outline: "none",
             }}
@@ -1918,21 +1919,20 @@ export default function AdminBlogPage() {
         {/* Table */}
         <div
           style={{
-            background: "white",
-            borderRadius: "1rem",
-            border: "1px solid #E2E8F0",
+            background: "var(--color-surface, white)",
+            borderRadius: "var(--radius-lg, 1rem)",
+            border: "1px solid var(--color-border, #E2E8F0)",
             overflow: "hidden",
             boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
           }}
         >
-          {/* Table header */}
           <div
             style={{
               display: "grid",
               gridTemplateColumns: "1fr 140px 120px 100px 80px 80px 100px",
               padding: "0.75rem 1.25rem",
               borderBottom: "1px solid #F1F5F9",
-              background: "#F8FAFC",
+              background: "var(--color-surface-2, #F8FAFC)",
             }}
           >
             {[
@@ -1949,7 +1949,7 @@ export default function AdminBlogPage() {
                 style={{
                   fontSize: "0.7rem",
                   fontWeight: 700,
-                  color: "#94A3B8",
+                  color: "var(--color-text-muted, #94A3B8)",
                   textTransform: "uppercase",
                   letterSpacing: "0.08em",
                 }}
@@ -1964,7 +1964,7 @@ export default function AdminBlogPage() {
               <Loader2
                 size={28}
                 style={{
-                  color: "#FF6B6B",
+                  color: "var(--color-primary, #FF6B6B)",
                   animation: "spin 1s linear infinite",
                   margin: "0 auto",
                 }}
@@ -1978,7 +1978,7 @@ export default function AdminBlogPage() {
               />
               <p
                 style={{
-                  color: "#94A3B8",
+                  color: "var(--color-text-muted, #94A3B8)",
                   fontFamily: "var(--font-heading)",
                   fontWeight: 600,
                 }}
@@ -1990,9 +1990,9 @@ export default function AdminBlogPage() {
                 style={{
                   marginTop: "1rem",
                   padding: "0.625rem 1.25rem",
-                  borderRadius: "0.625rem",
+                  borderRadius: "var(--radius, 0.625rem)",
                   border: "none",
-                  background: "#FF6B6B",
+                  background: "var(--color-primary, #FF6B6B)",
                   color: "white",
                   fontFamily: "var(--font-heading)",
                   fontWeight: 600,
@@ -2022,7 +2022,6 @@ export default function AdminBlogPage() {
                   (e.currentTarget.style.background = "white")
                 }
               >
-                {/* Title */}
                 <div style={{ minWidth: 0 }}>
                   <div
                     style={{
@@ -2049,7 +2048,7 @@ export default function AdminBlogPage() {
                         fontFamily: "var(--font-heading)",
                         fontWeight: 600,
                         fontSize: "0.875rem",
-                        color: "#0F172A",
+                        color: "var(--color-text, #0F172A)",
                         margin: 0,
                         overflow: "hidden",
                         textOverflow: "ellipsis",
@@ -2060,19 +2059,20 @@ export default function AdminBlogPage() {
                     </p>
                   </div>
                 </div>
-
-                {/* Category */}
-                <span style={{ fontSize: "0.8125rem", color: "#64748B" }}>
+                <span
+                  style={{
+                    fontSize: "0.8125rem",
+                    color: "var(--color-text-secondary, #64748B)",
+                  }}
+                >
                   {post.category?.name || post.category || (
                     <span style={{ color: "#CBD5E1" }}>—</span>
                   )}
                 </span>
-
-                {/* Author */}
                 <span
                   style={{
                     fontSize: "0.8125rem",
-                    color: "#64748B",
+                    color: "var(--color-text-secondary, #64748B)",
                     overflow: "hidden",
                     textOverflow: "ellipsis",
                     whiteSpace: "nowrap",
@@ -2080,30 +2080,30 @@ export default function AdminBlogPage() {
                 >
                   {post.author_name || "—"}
                 </span>
-
-                {/* Status */}
                 <StatusBadge status={post.status} />
-
-                {/* Views */}
                 <div
                   style={{
                     display: "flex",
                     alignItems: "center",
                     gap: "0.25rem",
                     fontSize: "0.8125rem",
-                    color: "#64748B",
+                    color: "var(--color-text-secondary, #64748B)",
                   }}
                 >
-                  <BarChart2 size={12} style={{ color: "#94A3B8" }} />{" "}
+                  <BarChart2
+                    size={12}
+                    style={{ color: "var(--color-text-muted, #94A3B8)" }}
+                  />{" "}
                   {post.views_count || 0}
                 </div>
-
-                {/* Date */}
-                <span style={{ fontSize: "0.75rem", color: "#94A3B8" }}>
+                <span
+                  style={{
+                    fontSize: "0.75rem",
+                    color: "var(--color-text-muted, #94A3B8)",
+                  }}
+                >
                   {formatDate(post.published_at || post.createdAt)}
                 </span>
-
-                {/* Actions */}
                 <div style={{ display: "flex", gap: "0.375rem" }}>
                   <button
                     onClick={() => openEdit(post)}
@@ -2111,10 +2111,10 @@ export default function AdminBlogPage() {
                     style={{
                       padding: "0.4rem",
                       borderRadius: "0.375rem",
-                      border: "1px solid #E2E8F0",
-                      background: "white",
+                      border: "1px solid var(--color-border, #E2E8F0)",
+                      background: "var(--color-surface, white)",
                       cursor: "pointer",
-                      color: "#475569",
+                      color: "var(--color-text-secondary, #475569)",
                       display: "flex",
                     }}
                   >
@@ -2141,61 +2141,16 @@ export default function AdminBlogPage() {
           )}
         </div>
 
-        {/* Pagination */}
-        {totalPages > 1 && (
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              marginTop: "1.5rem",
-            }}
-          >
-            <p style={{ fontSize: "0.875rem", color: "#94A3B8" }}>
-              Page {page} of {totalPages}
-            </p>
-            <div style={{ display: "flex", gap: "0.5rem" }}>
-              <button
-                onClick={() => loadPosts(page - 1)}
-                disabled={page === 1}
-                style={{
-                  padding: "0.5rem 0.875rem",
-                  borderRadius: "0.625rem",
-                  border: "1px solid #E2E8F0",
-                  background: "white",
-                  cursor: page === 1 ? "not-allowed" : "pointer",
-                  opacity: page === 1 ? 0.4 : 1,
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "0.25rem",
-                  fontSize: "0.875rem",
-                  color: "#475569",
-                }}
-              >
-                <ChevronLeft size={15} /> Prev
-              </button>
-              <button
-                onClick={() => loadPosts(page + 1)}
-                disabled={page === totalPages}
-                style={{
-                  padding: "0.5rem 0.875rem",
-                  borderRadius: "0.625rem",
-                  border: "1px solid #E2E8F0",
-                  background: "white",
-                  cursor: page === totalPages ? "not-allowed" : "pointer",
-                  opacity: page === totalPages ? 0.4 : 1,
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "0.25rem",
-                  fontSize: "0.875rem",
-                  color: "#475569",
-                }}
-              >
-                Next <ChevronRight size={15} />
-              </button>
-            </div>
-          </div>
-        )}
+        {/* ── Pagination ── */}
+        <Pagination
+          page={page}
+          totalPages={totalPages}
+          total={total}
+          perPage={perPage}
+          onPage={(p) => loadPosts(p)}
+          onPerPage={handlePerPage}
+          label="posts"
+        />
       </div>
 
       {/* Modals */}

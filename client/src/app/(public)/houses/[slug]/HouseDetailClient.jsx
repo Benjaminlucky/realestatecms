@@ -1,5 +1,7 @@
 "use client";
 
+import Image from "next/image";
+
 import { useState } from "react";
 import Link from "next/link";
 import {
@@ -186,11 +188,12 @@ function Lightbox({ images, startIndex, onClose }) {
                 cursor: "pointer",
               }}
             >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+              <Image
                 src={img}
-                alt=""
-                style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                alt={`${title} — gallery photo ${i + 1}`}
+                fill
+                sizes="96px"
+                style={{ objectFit: "cover" }}
               />
             </button>
           ))}
@@ -706,15 +709,13 @@ export default function HouseDetailClient({ house, settings, related }) {
                       background: "#1e293b",
                     }}
                   >
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
+                    <Image
                       src={allImages[0]}
                       alt={title}
-                      style={{
-                        width: "100%",
-                        height: "100%",
-                        objectFit: "cover",
-                      }}
+                      fill
+                      sizes="(max-width:768px) 100vw, (max-width:1200px) 80vw, 70vw"
+                      priority
+                      style={{ objectFit: "cover" }}
                     />
                     <div
                       style={{
@@ -770,7 +771,7 @@ export default function HouseDetailClient({ house, settings, related }) {
                           {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img
                             src={img}
-                            alt=""
+                            alt={`${title} — photo ${i + 1}`}
                             style={{
                               width: "100%",
                               height: "100%",

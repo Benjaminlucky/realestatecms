@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
@@ -262,13 +263,15 @@ function RelatedCard({ post, index }) {
         }}
       >
         {imageUrl && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
+          <Image
             src={imageUrl}
             alt={post.title}
-            style={{ width: "100%", height: "100%", objectFit: "cover" }}
+            fill
+            sizes="(max-width:768px) 100vw, (max-width:1200px) 90vw, 80vw"
+            priority
+            style={{ objectFit: "cover" }}
             onError={(e) => {
-              e.target.style.display = "none";
+              e.currentTarget.style.display = "none";
             }}
           />
         )}
@@ -705,12 +708,13 @@ export default function BlogPostClient({ post, settings, related }) {
                     background: "#1e293b",
                   }}
                 >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
+                  <Image
                     src={coverUrl}
                     alt={title}
+                    fill
+                    sizes="(max-width:640px) 100vw, 33vw"
                     style={{
-                      width: "100%",
+                      objectFit: "cover",
                       maxHeight: "480px",
                       objectFit: "cover",
                       display: "block",

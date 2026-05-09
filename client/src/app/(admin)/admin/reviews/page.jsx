@@ -30,7 +30,7 @@ const S = {
     fontSize: "0.75rem",
     fontWeight: 600,
     marginBottom: "0.375rem",
-    color: "#475569",
+    color: "var(--color-text-secondary, #475569)",
     textTransform: "uppercase",
     letterSpacing: "0.05em",
     fontFamily: "Plus Jakarta Sans, sans-serif",
@@ -38,20 +38,20 @@ const S = {
   input: {
     width: "100%",
     padding: "0.625rem 0.875rem",
-    borderRadius: "0.625rem",
-    border: "1px solid #E2E8F0",
+    borderRadius: "var(--radius, 0.625rem)",
+    border: "1px solid var(--color-border, #E2E8F0)",
     fontSize: "0.875rem",
-    color: "#0F172A",
+    color: "var(--color-text, #0F172A)",
     outline: "none",
     fontFamily: "Inter, sans-serif",
     transition: "border-color 150ms",
-    background: "white",
+    background: "var(--color-surface, white)",
     boxSizing: "border-box",
   },
   card: {
-    background: "white",
-    border: "1px solid #E2E8F0",
-    borderRadius: "1rem",
+    background: "var(--color-surface, white)",
+    border: "1px solid var(--color-border, #E2E8F0)",
+    borderRadius: "var(--radius-lg, 1rem)",
     padding: "1.5rem",
     boxShadow: "0 1px 3px rgba(0,0,0,0.06)",
   },
@@ -185,7 +185,7 @@ function ReviewCard({ review, onEdit, onDelete, onToggle }) {
         style={{
           fontSize: "0.875rem",
           lineHeight: 1.65,
-          color: "#475569",
+          color: "var(--color-text-secondary, #475569)",
           margin: "0.75rem 0 1rem",
           fontStyle: "italic",
           display: "-webkit-box",
@@ -230,14 +230,20 @@ function ReviewCard({ review, onEdit, onDelete, onToggle }) {
               fontFamily: "Plus Jakarta Sans, sans-serif",
               fontWeight: 700,
               fontSize: "0.875rem",
-              color: "#0F172A",
+              color: "var(--color-text, #0F172A)",
               margin: 0,
             }}
           >
             {review.name}
           </p>
           {review.role && (
-            <p style={{ fontSize: "0.75rem", color: "#94A3B8", margin: 0 }}>
+            <p
+              style={{
+                fontSize: "0.75rem",
+                color: "var(--color-text-muted, #94A3B8)",
+                margin: 0,
+              }}
+            >
               {review.role}
             </p>
           )}
@@ -263,21 +269,21 @@ function ReviewCard({ review, onEdit, onDelete, onToggle }) {
             gap: "0.375rem",
             padding: "0.5rem",
             borderRadius: "0.5rem",
-            border: "1px solid #E2E8F0",
-            background: "white",
+            border: "1px solid var(--color-border, #E2E8F0)",
+            background: "var(--color-surface, white)",
             cursor: "pointer",
             fontSize: "0.8rem",
             fontWeight: 600,
-            color: "#475569",
+            color: "var(--color-text-secondary, #475569)",
             fontFamily: "Plus Jakarta Sans, sans-serif",
             transition: "all 150ms",
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.borderColor = "#FF6B6B";
-            e.currentTarget.style.color = "#FF6B6B";
+            e.currentTarget.style.borderColor = "var(--color-primary, #FF6B6B)";
+            e.currentTarget.style.color = "var(--color-primary, #FF6B6B)";
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.borderColor = "#E2E8F0";
+            e.currentTarget.style.borderColor = "var(--color-border, #E2E8F0)";
             e.currentTarget.style.color = "#475569";
           }}
         >
@@ -295,12 +301,12 @@ function ReviewCard({ review, onEdit, onDelete, onToggle }) {
             gap: "0.375rem",
             padding: "0.5rem",
             borderRadius: "0.5rem",
-            border: "1px solid #E2E8F0",
-            background: "white",
+            border: "1px solid var(--color-border, #E2E8F0)",
+            background: "var(--color-surface, white)",
             cursor: "pointer",
             fontSize: "0.8rem",
             fontWeight: 600,
-            color: "#475569",
+            color: "var(--color-text-secondary, #475569)",
             fontFamily: "Plus Jakarta Sans, sans-serif",
             transition: "all 150ms",
             opacity: toggling ? 0.5 : 1,
@@ -401,8 +407,8 @@ function ReviewModal({ initial, onClose, onSave }) {
       <div
         onClick={(e) => e.stopPropagation()}
         style={{
-          background: "white",
-          borderRadius: "1rem",
+          background: "var(--color-surface, white)",
+          borderRadius: "var(--radius-lg, 1rem)",
           padding: "1.75rem",
           width: "100%",
           maxWidth: "560px",
@@ -425,7 +431,7 @@ function ReviewModal({ initial, onClose, onSave }) {
               fontFamily: "Plus Jakarta Sans, sans-serif",
               fontWeight: 800,
               fontSize: "1.125rem",
-              color: "#0F172A",
+              color: "var(--color-text, #0F172A)",
               margin: 0,
             }}
           >
@@ -437,7 +443,7 @@ function ReviewModal({ initial, onClose, onSave }) {
               background: "none",
               border: "none",
               cursor: "pointer",
-              color: "#94A3B8",
+              color: "var(--color-text-muted, #94A3B8)",
               padding: "0.25rem",
             }}
           >
@@ -452,15 +458,20 @@ function ReviewModal({ initial, onClose, onSave }) {
           {/* Name */}
           <div>
             <label style={S.label}>
-              Client Name <span style={{ color: "#FF6B6B" }}>*</span>
+              Client Name{" "}
+              <span style={{ color: "var(--color-primary, #FF6B6B)" }}>*</span>
             </label>
             <input
               value={form.name}
               onChange={(e) => set("name", e.target.value)}
               placeholder="e.g. Chukwuemeka Obi"
               style={S.input}
-              onFocus={(e) => (e.target.style.borderColor = "#FF6B6B")}
-              onBlur={(e) => (e.target.style.borderColor = "#E2E8F0")}
+              onFocus={(e) =>
+                (e.target.style.borderColor = "var(--color-primary, #FF6B6B)")
+              }
+              onBlur={(e) =>
+                (e.target.style.borderColor = "var(--color-border, #E2E8F0)")
+              }
             />
           </div>
 
@@ -472,8 +483,12 @@ function ReviewModal({ initial, onClose, onSave }) {
               onChange={(e) => set("role", e.target.value)}
               placeholder="e.g. Land Buyer, Lekki"
               style={S.input}
-              onFocus={(e) => (e.target.style.borderColor = "#FF6B6B")}
-              onBlur={(e) => (e.target.style.borderColor = "#E2E8F0")}
+              onFocus={(e) =>
+                (e.target.style.borderColor = "var(--color-primary, #FF6B6B)")
+              }
+              onBlur={(e) =>
+                (e.target.style.borderColor = "var(--color-border, #E2E8F0)")
+              }
             />
           </div>
 
@@ -489,7 +504,8 @@ function ReviewModal({ initial, onClose, onSave }) {
           {/* Review text */}
           <div>
             <label style={S.label}>
-              Review Text <span style={{ color: "#FF6B6B" }}>*</span>
+              Review Text{" "}
+              <span style={{ color: "var(--color-primary, #FF6B6B)" }}>*</span>
             </label>
             <textarea
               value={form.review}
@@ -497,8 +513,12 @@ function ReviewModal({ initial, onClose, onSave }) {
               placeholder="What the client said about their experience..."
               rows={4}
               style={{ ...S.input, resize: "vertical" }}
-              onFocus={(e) => (e.target.style.borderColor = "#FF6B6B")}
-              onBlur={(e) => (e.target.style.borderColor = "#E2E8F0")}
+              onFocus={(e) =>
+                (e.target.style.borderColor = "var(--color-primary, #FF6B6B)")
+              }
+              onBlur={(e) =>
+                (e.target.style.borderColor = "var(--color-border, #E2E8F0)")
+              }
             />
           </div>
 
@@ -520,13 +540,17 @@ function ReviewModal({ initial, onClose, onSave }) {
                 }
                 min={0}
                 style={S.input}
-                onFocus={(e) => (e.target.style.borderColor = "#FF6B6B")}
-                onBlur={(e) => (e.target.style.borderColor = "#E2E8F0")}
+                onFocus={(e) =>
+                  (e.target.style.borderColor = "var(--color-primary, #FF6B6B)")
+                }
+                onBlur={(e) =>
+                  (e.target.style.borderColor = "var(--color-border, #E2E8F0)")
+                }
               />
               <p
                 style={{
                   fontSize: "0.7rem",
-                  color: "#94A3B8",
+                  color: "var(--color-text-muted, #94A3B8)",
                   marginTop: "0.25rem",
                 }}
               >
@@ -564,7 +588,7 @@ function ReviewModal({ initial, onClose, onSave }) {
                   <span
                     style={{
                       fontSize: "0.875rem",
-                      color: "#0F172A",
+                      color: "var(--color-text, #0F172A)",
                       fontWeight: 600,
                     }}
                   >
@@ -585,10 +609,10 @@ function ReviewModal({ initial, onClose, onSave }) {
               style={{
                 flex: 1,
                 padding: "0.75rem",
-                borderRadius: "0.625rem",
-                border: "1px solid #E2E8F0",
-                background: "white",
-                color: "#475569",
+                borderRadius: "var(--radius, 0.625rem)",
+                border: "1px solid var(--color-border, #E2E8F0)",
+                background: "var(--color-surface, white)",
+                color: "var(--color-text-secondary, #475569)",
                 fontFamily: "Plus Jakarta Sans, sans-serif",
                 fontWeight: 600,
                 fontSize: "0.875rem",
@@ -603,7 +627,7 @@ function ReviewModal({ initial, onClose, onSave }) {
               style={{
                 flex: 2,
                 padding: "0.75rem",
-                borderRadius: "0.625rem",
+                borderRadius: "var(--radius, 0.625rem)",
                 border: "none",
                 background: "linear-gradient(135deg, #FF6B6B, #E85555)",
                 color: "white",
@@ -711,20 +735,29 @@ export default function AdminReviewsPage() {
                 marginBottom: "0.25rem",
               }}
             >
-              <Star size={20} style={{ color: "#FF6B6B" }} />
+              <Star
+                size={20}
+                style={{ color: "var(--color-primary, #FF6B6B)" }}
+              />
               <h1
                 style={{
                   fontFamily: "Plus Jakarta Sans, sans-serif",
                   fontWeight: 800,
                   fontSize: "1.5rem",
-                  color: "#0F172A",
+                  color: "var(--color-text, #0F172A)",
                   margin: 0,
                 }}
               >
                 Client Reviews
               </h1>
             </div>
-            <p style={{ color: "#94A3B8", fontSize: "0.875rem", margin: 0 }}>
+            <p
+              style={{
+                color: "var(--color-text-muted, #94A3B8)",
+                fontSize: "0.875rem",
+                margin: 0,
+              }}
+            >
               {published} of {reviews.length} review
               {reviews.length !== 1 ? "s" : ""} published on the homepage
             </p>
@@ -738,10 +771,10 @@ export default function AdminReviewsPage() {
                 alignItems: "center",
                 gap: "0.5rem",
                 padding: "0.5rem 1rem",
-                borderRadius: "0.625rem",
-                border: "1px solid #E2E8F0",
-                background: "white",
-                color: "#475569",
+                borderRadius: "var(--radius, 0.625rem)",
+                border: "1px solid var(--color-border, #E2E8F0)",
+                background: "var(--color-surface, white)",
+                color: "var(--color-text-secondary, #475569)",
                 fontFamily: "Plus Jakarta Sans, sans-serif",
                 fontWeight: 600,
                 fontSize: "0.8125rem",
@@ -764,7 +797,7 @@ export default function AdminReviewsPage() {
                 alignItems: "center",
                 gap: "0.5rem",
                 padding: "0.5rem 1.125rem",
-                borderRadius: "0.625rem",
+                borderRadius: "var(--radius, 0.625rem)",
                 border: "none",
                 background: "linear-gradient(135deg, #FF6B6B, #E85555)",
                 color: "white",
@@ -794,7 +827,7 @@ export default function AdminReviewsPage() {
               left: "0.75rem",
               top: "50%",
               transform: "translateY(-50%)",
-              color: "#94A3B8",
+              color: "var(--color-text-muted, #94A3B8)",
             }}
           />
           <input
@@ -802,8 +835,12 @@ export default function AdminReviewsPage() {
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by name or review text..."
             style={{ ...S.input, paddingLeft: "2.25rem" }}
-            onFocus={(e) => (e.target.style.borderColor = "#FF6B6B")}
-            onBlur={(e) => (e.target.style.borderColor = "#E2E8F0")}
+            onFocus={(e) =>
+              (e.target.style.borderColor = "var(--color-primary, #FF6B6B)")
+            }
+            onBlur={(e) =>
+              (e.target.style.borderColor = "var(--color-border, #E2E8F0)")
+            }
           />
         </div>
 
@@ -851,7 +888,7 @@ export default function AdminReviewsPage() {
                 <div
                   style={{
                     height: "0.75rem",
-                    background: "#F1F5F9",
+                    background: "var(--color-surface-3, #F1F5F9)",
                     borderRadius: "0.25rem",
                     width: "40%",
                     marginBottom: "1rem",
@@ -860,7 +897,7 @@ export default function AdminReviewsPage() {
                 <div
                   style={{
                     height: "4rem",
-                    background: "#F1F5F9",
+                    background: "var(--color-surface-3, #F1F5F9)",
                     borderRadius: "0.25rem",
                     marginBottom: "1rem",
                   }}
@@ -868,7 +905,7 @@ export default function AdminReviewsPage() {
                 <div
                   style={{
                     height: "0.875rem",
-                    background: "#F1F5F9",
+                    background: "var(--color-surface-3, #F1F5F9)",
                     borderRadius: "0.25rem",
                     width: "60%",
                   }}
@@ -885,7 +922,7 @@ export default function AdminReviewsPage() {
               ...S.card,
               textAlign: "center",
               padding: "3rem",
-              color: "#94A3B8",
+              color: "var(--color-text-muted, #94A3B8)",
             }}
           >
             <Star size={36} style={{ margin: "0 auto 1rem", opacity: 0.3 }} />
@@ -894,7 +931,7 @@ export default function AdminReviewsPage() {
                 fontFamily: "Plus Jakarta Sans, sans-serif",
                 fontWeight: 700,
                 fontSize: "1rem",
-                color: "#0F172A",
+                color: "var(--color-text, #0F172A)",
                 marginBottom: "0.5rem",
               }}
             >
@@ -910,9 +947,9 @@ export default function AdminReviewsPage() {
                 onClick={() => setModal(EMPTY)}
                 style={{
                   padding: "0.625rem 1.25rem",
-                  borderRadius: "0.625rem",
+                  borderRadius: "var(--radius, 0.625rem)",
                   border: "none",
-                  background: "#FF6B6B",
+                  background: "var(--color-primary, #FF6B6B)",
                   color: "white",
                   fontFamily: "Plus Jakarta Sans, sans-serif",
                   fontWeight: 700,

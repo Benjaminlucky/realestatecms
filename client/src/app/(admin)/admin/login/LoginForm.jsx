@@ -1,6 +1,8 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { API_URL } from "@/config/site";
+
+import { useState, useEffect, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import {
   Eye,
@@ -23,6 +25,17 @@ export default function LoginForm() {
   const [showPass, setShowPass] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const [siteName, setSiteName] = useState("");
+
+  useEffect(() => {
+    fetch(`${API_URL}/settings`)
+      .then((r) => r.json())
+      .then((json) => {
+        const name = json?.data?.settings?.site_name;
+        if (name) setSiteName(name);
+      })
+      .catch(() => {});
+  }, []);
   const lock = useRef(false);
 
   const handleChange = (e) => {
@@ -138,7 +151,7 @@ export default function LoginForm() {
                 marginBottom: "0.2rem",
               }}
             >
-              NaijaRealty
+              {siteName || "Admin"}
             </p>
             <p
               style={{
@@ -241,7 +254,7 @@ export default function LoginForm() {
                 fontSize: "1rem",
               }}
             >
-              NaijaRealty
+              {siteName || "Admin"}
             </span>
           </div>
 

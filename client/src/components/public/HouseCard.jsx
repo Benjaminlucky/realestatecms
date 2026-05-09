@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { MapPin, BedDouble, Bath, Car } from "lucide-react";
 import {
   formatPrice,
@@ -82,19 +83,15 @@ export default function HouseCard({ house, whatsapp }) {
           style={{ background: "#1e293b" }}
         >
           {imageUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
+            <Image
               src={imageUrl}
               alt={`${title} - Property in ${location}`}
-              style={{
-                width: "100%",
-                height: "100%",
-                objectFit: "cover",
-                transition: "transform 500ms",
-              }}
+              fill
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
               className="transition-transform duration-500 group-hover:scale-105"
+              style={{ objectFit: "cover" }}
               onError={(e) => {
-                e.target.style.display = "none";
+                e.currentTarget.style.display = "none";
               }}
             />
           ) : (

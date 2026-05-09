@@ -626,3 +626,287 @@
     background: var(--color-border);
   }
 }
+
+/* ══════════════════════════════════════════════════════════════════
+   ADMIN UI — Shared utility classes
+   These replace the inline S = { card, label, input, grid2 } objects
+   that were hardcoded in every admin page. Using CSS classes means:
+   - Styles are cached by the browser (not re-sent in every HTML response)
+   - CSS variables apply uniformly (theme changes work in admin too)
+   - Tailwind can purge unused classes correctly
+   ══════════════════════════════════════════════════════════════════ */
+
+/* ── Layout ── */
+.admin-page {
+  padding: 2rem;
+  max-width: 1100px;
+  font-family: Inter, sans-serif;
+}
+
+.admin-page-wide {
+  padding: 2rem;
+  max-width: 1300px;
+  font-family: Inter, sans-serif;
+}
+
+/* ── Card ── */
+.admin-card {
+  background: white;
+  border: 1px solid var(--color-border, #e2e8f0);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  margin-bottom: 1.5rem;
+}
+
+/* ── Form label ── */
+.admin-label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin-bottom: 0.375rem;
+  color: var(--color-text-secondary, #475569);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-family: "Plus Jakarta Sans", sans-serif;
+}
+
+/* ── Text input / select ── */
+.admin-input {
+  width: 100%;
+  padding: 0.625rem 0.875rem;
+  border-radius: var(--radius, 0.625rem);
+  border: 1px solid var(--color-border, #e2e8f0);
+  font-size: 0.875rem;
+  color: var(--color-text, #0f172a);
+  outline: none;
+  background: white;
+  box-sizing: border-box;
+  transition: border-color 150ms;
+  font-family: Inter, sans-serif;
+}
+
+.admin-input:focus {
+  border-color: var(--color-primary, #ff6b6b);
+}
+
+/* ── Textarea ── */
+.admin-textarea {
+  width: 100%;
+  padding: 0.625rem 0.875rem;
+  border-radius: var(--radius, 0.625rem);
+  border: 1px solid var(--color-border, #e2e8f0);
+  font-size: 0.875rem;
+  color: var(--color-text, #0f172a);
+  outline: none;
+  background: white;
+  box-sizing: border-box;
+  resize: vertical;
+  transition: border-color 150ms;
+  font-family: Inter, sans-serif;
+}
+
+.admin-textarea:focus {
+  border-color: var(--color-primary, #ff6b6b);
+}
+
+/* ── 2-column grid ── */
+.admin-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+/* ── 3-column grid ── */
+.admin-grid-3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1rem;
+}
+
+/* ── Section title inside a card ── */
+.admin-section-title {
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--color-text, #0f172a);
+  margin: 0 0 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+}
+
+/* ── Primary action button ── */
+.admin-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.25rem;
+  border-radius: var(--radius, 0.625rem);
+  border: none;
+  background: linear-gradient(135deg, var(--color-primary, #ff6b6b), #e85555);
+  color: white;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-weight: 700;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: opacity 150ms;
+}
+
+.admin-btn-primary:hover {
+  opacity: 0.88;
+}
+.admin-btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ── Secondary / outline button ── */
+.admin-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius, 0.625rem);
+  border: 1px solid var(--color-border, #e2e8f0);
+  background: white;
+  color: var(--color-text-secondary, #475569);
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-weight: 600;
+  font-size: 0.8125rem;
+  cursor: pointer;
+  transition:
+    border-color 150ms,
+    color 150ms;
+}
+
+.admin-btn-secondary:hover {
+  border-color: var(--color-primary, #ff6b6b);
+  color: var(--color-primary, #ff6b6b);
+}
+
+.admin-btn-secondary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ── Danger button ── */
+.admin-btn-danger {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.375rem 0.625rem;
+  border-radius: 0.5rem;
+  border: none;
+  background: #fee2e2;
+  color: #ef4444;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-weight: 600;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: background 150ms;
+}
+
+.admin-btn-danger:hover {
+  background: #fecaca;
+}
+.admin-btn-danger:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ── Status badge ── */
+.admin-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  font-family: "Plus Jakarta Sans", sans-serif;
+}
+
+.admin-badge-green {
+  background: #dcfce7;
+  color: #16a34a;
+}
+.admin-badge-blue {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+.admin-badge-yellow {
+  background: #fef9c3;
+  color: #92400e;
+}
+.admin-badge-gray {
+  background: #f1f5f9;
+  color: #64748b;
+}
+.admin-badge-red {
+  background: #fee2e2;
+  color: #ef4444;
+}
+
+/* ── Table-style row ── */
+.admin-row {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  padding: 0.875rem 1rem;
+  border-radius: 0.75rem;
+  border: 1px solid var(--color-border, #e2e8f0);
+  margin-bottom: 0.625rem;
+  background: white;
+  transition: box-shadow 150ms;
+}
+
+.admin-row:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+/* ── Page header ── */
+.admin-page-header {
+  margin-bottom: 2rem;
+}
+
+.admin-page-header h1 {
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-weight: 800;
+  font-size: 1.5rem;
+  color: var(--color-text, #0f172a);
+  margin: 0 0 0.375rem;
+}
+
+.admin-page-header p {
+  color: var(--color-text-secondary, #64748b);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+/* ── Card header row (title + actions) ── */
+.admin-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+}
+
+/* ── Empty state ── */
+.admin-empty {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--color-text-muted, #94a3b8);
+  font-size: 0.875rem;
+}
+
+/* ── Responsive: stack 2-col grid on mobile ── */
+@media (max-width: 640px) {
+  .admin-grid-2,
+  .admin-grid-3 {
+    grid-template-columns: 1fr;
+  }
+  .admin-page,
+  .admin-page-wide {
+    padding: 1rem;
+  }
+}

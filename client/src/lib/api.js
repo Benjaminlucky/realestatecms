@@ -231,3 +231,71 @@ export const reviewsApi = {
 
   delete: (id) => fetcher(`/admin/reviews/${id}`, { method: "DELETE" }),
 };
+
+export const aboutApi = {
+  get: () => serverFetch("/about", { cache: "no-store" }),
+  save: (d) =>
+    fetcher("/admin/about", { method: "PUT", body: JSON.stringify(d) }),
+};
+
+// ── Popular Areas ────────────────────────────────────────────────
+export const popularAreasApi = {
+  getPublic: () => fetcher("/popular-areas"),
+  getAll: () => fetcher("/admin/popular-areas"),
+  create: (formData) => {
+    const headers = {};
+    if (typeof window !== "undefined") {
+      const t = localStorage.getItem("nr_token");
+      if (t) headers["Authorization"] = `Bearer ${t}`;
+    }
+    return fetch(`${API_URL}/admin/popular-areas`, {
+      method: "POST",
+      headers,
+      body: formData,
+    }).then((r) => r.json());
+  },
+  update: (id, formData) => {
+    const headers = {};
+    if (typeof window !== "undefined") {
+      const t = localStorage.getItem("nr_token");
+      if (t) headers["Authorization"] = `Bearer ${t}`;
+    }
+    return fetch(`${API_URL}/admin/popular-areas/${id}`, {
+      method: "PUT",
+      headers,
+      body: formData,
+    }).then((r) => r.json());
+  },
+  delete: (id) => fetcher(`/admin/popular-areas/${id}`, { method: "DELETE" }),
+};
+
+// ── Partners ─────────────────────────────────────────────────────
+export const partnersApi = {
+  getPublic: () => fetcher("/partners"),
+  getAll: () => fetcher("/admin/partners"),
+  create: (formData) => {
+    const headers = {};
+    if (typeof window !== "undefined") {
+      const t = localStorage.getItem("nr_token");
+      if (t) headers["Authorization"] = `Bearer ${t}`;
+    }
+    return fetch(`${API_URL}/admin/partners`, {
+      method: "POST",
+      headers,
+      body: formData,
+    }).then((r) => r.json());
+  },
+  update: (id, formData) => {
+    const headers = {};
+    if (typeof window !== "undefined") {
+      const t = localStorage.getItem("nr_token");
+      if (t) headers["Authorization"] = `Bearer ${t}`;
+    }
+    return fetch(`${API_URL}/admin/partners/${id}`, {
+      method: "PUT",
+      headers,
+      body: formData,
+    }).then((r) => r.json());
+  },
+  delete: (id) => fetcher(`/admin/partners/${id}`, { method: "DELETE" }),
+};

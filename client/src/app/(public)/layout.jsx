@@ -1,11 +1,11 @@
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
-import { settingsApi } from "@/lib/api";
+import { serverFetch } from "@/lib/api";
 
 async function getSiteSettings() {
   try {
-    const data = await settingsApi.getPublic();
-    return data?.settings || {};
+    const data = await serverFetch("/settings", { next: { revalidate: 300 } });
+    return data?.data?.settings || {};
   } catch {
     return {};
   }

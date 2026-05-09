@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   ArrowRight,
   ChevronLeft,
@@ -1502,31 +1502,51 @@ export function FeaturedHouses({ houses = [] }) {
 // POPULAR AREAS
 // ════════════════════════════════════════════════════════════
 export function PopularAreas({ areas = [] }) {
-  const defaultAreas = [
-    {
-      name: "Lekki Phase 1",
-      location: "Lagos",
-      image: null,
-      count: "24 Properties",
-    },
-    { name: "Ikate", location: "Lagos", image: null, count: "18 Properties" },
-    {
-      name: "Chevron Drive",
-      location: "Lagos",
-      image: null,
-      count: "31 Properties",
-    },
-    { name: "Maitama", location: "Abuja", image: null, count: "15 Properties" },
-    { name: "Asokoro", location: "Abuja", image: null, count: "22 Properties" },
-    {
-      name: "GRA",
-      location: "Port Harcourt",
-      image: null,
-      count: "19 Properties",
-    },
-  ];
+  // Initialise from prop immediately; self-fetch only once if prop is empty.
+  // useRef guard prevents re-renders from re-triggering the fetch and
+  // overwriting live DB data with the hardcoded fallback.
+  const [displayAreas, setDisplayAreas] = useState(
+    areas.length > 0 ? areas : null,
+  );
+  const fetchedRef = useRef(false);
 
-  const displayAreas = areas.length ? areas : defaultAreas;
+  useEffect(() => {
+    // Props arrived with real data — use them, no fetch needed.
+    if (areas.length > 0) {
+      setDisplayAreas(areas);
+      return;
+    }
+    // Guard: only self-fetch once, never on subsequent re-renders.
+    if (fetchedRef.current) return;
+    fetchedRef.current = true;
+
+    const FALLBACK = [
+      { name: "Lekki Phase 1", location: "Lagos", count: "24 Properties" },
+      { name: "Ikate", location: "Lagos", count: "18 Properties" },
+      { name: "Chevron Drive", location: "Lagos", count: "31 Properties" },
+      { name: "Maitama", location: "Abuja", count: "15 Properties" },
+      { name: "Asokoro", location: "Abuja", count: "22 Properties" },
+      { name: "GRA", location: "Port Harcourt", count: "19 Properties" },
+    ];
+
+    fetch(API_URL + "/popular-areas")
+      .then((r) => r.json())
+      .then((json) => {
+        const data = json?.data || [];
+        setDisplayAreas(data.length > 0 ? data : FALLBACK);
+      })
+      .catch(() => setDisplayAreas(FALLBACK));
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // While the self-fetch is in-flight show the fallback immediately
+  const items = displayAreas ?? [
+    { name: "Lekki Phase 1", location: "Lagos", count: "24 Properties" },
+    { name: "Ikate", location: "Lagos", count: "18 Properties" },
+    { name: "Chevron Drive", location: "Lagos", count: "31 Properties" },
+    { name: "Maitama", location: "Abuja", count: "15 Properties" },
+    { name: "Asokoro", location: "Abuja", count: "22 Properties" },
+    { name: "GRA", location: "Port Harcourt", count: "19 Properties" },
+  ];
 
   return (
     <section
@@ -1540,13 +1560,16 @@ export function PopularAreas({ areas = [] }) {
         />
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {displayAreas.slice(0, 6).map((area) => {
-            const imageUrl = area.image ? getImgUrl(area.image) : null;
+          {items.slice(0, 6).map((area) => {
+            const imageUrl = area.image_url ? getImgUrl(area.image_url) : null;
+            const href = area.link_path
+              ? area.link_path
+              : `/lands?location=${encodeURIComponent(area.name)}`;
 
             return (
               <Link
                 key={area.name}
-                href={`/lands?location=${encodeURIComponent(area.name)}`}
+                href={href}
                 className="group relative h-64 rounded-2xl overflow-hidden block"
               >
                 {/* ✅ plain <img> — avoids Next.js private-IP SSR blocking */}
@@ -1704,7 +1727,7 @@ export function Testimonials({ testimonials = [] }) {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {displayTestimonials.map((t) => (
             <div
-              key={t.id}
+              key={t._id || t.id}
               className="rounded-2xl p-6"
               style={{
                 background: "rgba(255,255,255,0.05)",
@@ -1767,16 +1790,44 @@ export function Testimonials({ testimonials = [] }) {
 // PARTNERS
 // ════════════════════════════════════════════════════════════
 export function Partners({ partners = [] }) {
-  const defaultPartners = [
-    { id: 1, name: "Landmark Group", logo: null },
-    { id: 2, name: "CruxStone Realty", logo: null },
-    { id: 3, name: "Quest Properties", logo: null },
-    { id: 4, name: "Veritasi Homes", logo: null },
-    { id: 5, name: "Mixta Africa", logo: null },
-    { id: 6, name: "Propertymart", logo: null },
+  const FALLBACK = [
+    { id: 1, name: "Landmark Group" },
+    { id: 2, name: "CruxStone Realty" },
+    { id: 3, name: "Quest Properties" },
+    { id: 4, name: "Veritasi Homes" },
+    { id: 5, name: "Mixta Africa" },
+    { id: 6, name: "Propertymart" },
   ];
 
-  const displayPartners = partners.length ? partners : defaultPartners;
+  // Initialise from prop immediately; self-fetch only once if prop is empty.
+  // useRef guard prevents re-renders from re-triggering the fetch and
+  // overwriting live DB data with the hardcoded fallback.
+  const [displayPartners, setDisplayPartners] = useState(
+    partners.length > 0 ? partners : null,
+  );
+  const partnerFetchedRef = useRef(false);
+
+  useEffect(() => {
+    // Props arrived with real data — use them, no fetch needed.
+    if (partners.length > 0) {
+      setDisplayPartners(partners);
+      return;
+    }
+    // Guard: only self-fetch once, never on subsequent re-renders.
+    if (partnerFetchedRef.current) return;
+    partnerFetchedRef.current = true;
+
+    fetch(API_URL + "/partners")
+      .then((r) => r.json())
+      .then((json) => {
+        const data = json?.data || [];
+        setDisplayPartners(data.length > 0 ? data : FALLBACK);
+      })
+      .catch(() => setDisplayPartners(FALLBACK));
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // While the self-fetch is in-flight show the fallback immediately
+  const shownPartners = displayPartners ?? FALLBACK;
 
   return (
     <section className="py-14" style={{ background: "var(--color-surface)" }}>
@@ -1793,19 +1844,22 @@ export function Partners({ partners = [] }) {
         </p>
 
         <div className="flex flex-wrap items-center justify-center gap-8 md:gap-12">
-          {displayPartners.map((partner) => (
+          {shownPartners.map((partner) => (
             <div
-              key={partner.id}
+              key={partner._id || partner.id}
               className="flex items-center justify-center opacity-50 hover:opacity-100 transition-opacity duration-300 grayscale hover:grayscale-0"
             >
-              {partner.logo ? (
-                // Partner logos use fixed width/height (not fill) so next/image is safe here
-                <Image
-                  src={getImgUrl(partner.logo)}
+              {partner.logo_url || partner.logo ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={partner.logo_url || partner.logo}
                   alt={partner.name}
-                  width={120}
-                  height={40}
-                  className="h-10 w-auto object-contain"
+                  style={{
+                    height: "40px",
+                    width: "auto",
+                    maxWidth: "120px",
+                    objectFit: "contain",
+                  }}
                 />
               ) : (
                 <span

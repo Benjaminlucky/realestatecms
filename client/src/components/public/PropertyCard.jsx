@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { MapPin, Ruler } from "lucide-react";
 import {
   formatPrice,
@@ -80,19 +81,15 @@ export default function PropertyCard({ land, whatsapp }) {
           style={{ background: "#f1f5f9" }}
         >
           {imageUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
+            <Image
               src={imageUrl}
               alt={`${estate_name} - Land for sale in ${location}`}
-              style={{
-                width: "100%",
-                height: "100%",
-                objectFit: "cover",
-                transition: "transform 500ms",
-              }}
+              fill
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
               className="transition-transform duration-500 group-hover:scale-105"
+              style={{ objectFit: "cover" }}
               onError={(e) => {
-                e.target.style.display = "none";
+                e.currentTarget.style.display = "none";
               }}
             />
           ) : (
